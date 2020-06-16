@@ -1,0 +1,23 @@
+{
+  "name": "telegram_api",
+  "version": "1.0.0",
+  "description": "a test of the telegram api module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "node",
+    "js",
+    "telegram"
+  ],
+  "author": "Paul-Marie TATI",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-session": "^1.4.0",
+    "express": "^4.17.1",
+    "jsonfile": "^6.0.1",
+    "telegram-bot-api": "^1.3.3"
+  }
+}
