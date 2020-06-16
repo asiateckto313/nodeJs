@@ -48,8 +48,10 @@ let express = require('express'),
                             let msg = todoUtils.get_command(todolist,checkList,userId)
                             if(msg !=="Your todos :\n")
                                 todoUtils.sendMsg(userId, msg)
-                            else{ todoUtils.sendMsg(userId,"You don't have any todo"); //todoUtils.reset(userId,todolist)
-								}
+                            else{ 
+                                todoUtils.sendMsg(userId,"You don't have any todo"); 
+                                todoUtils.reset(userId,todolist)
+							}
                         }else if (result.data.command.toLowerCase() == 'start')
                             todoUtils.welcome_command(userId,username)
                     }

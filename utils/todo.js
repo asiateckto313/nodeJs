@@ -106,7 +106,8 @@ try {
         if(tailleTodoList){
             
             todoIndex = parseInt(todoIndex)
-            if(isNaN(todoIndex) || todoIndex <= 0 ) sendMsg(userId,"Invalid index")
+            if(isNaN(todoIndex) ) sendMsg(userId,"Invalid index")
+            if( todoIndex <= 0 ) sendMsg(userId,"Can not remove empty todos")
             else{
             
                 for(let i = 0; i < tailleTodoList; i++)
@@ -239,7 +240,14 @@ try {
            
     
        }
-    };
+    },reset = function(userId,array){
+		for(let i = 0 ; i < array.length ; i++)
+			if(array[i].chat_id == userId)
+				if(array[i].todos)
+					array[i].todos = new Array()
+				else if (array[i].todos_checked)
+					array[i].todos_checked = new Array()
+	};
     
    
     module.exports = {
@@ -253,6 +261,7 @@ try {
         welcome_command,
         check_command,
         verifyIndex,
+        reset,
         api
     }
     
