@@ -43,10 +43,8 @@ let express = require('express'),
                             todoUtils.check_command(instruction,todolist,checkList,userId)
                         }
                         if(command == 'reset'){
-                            if(instruction){
-                                todoUtils.reset(userId,instruction)
-                            }else
-                                todoUtils.sendMsg(userId,"Please specify the list to reset.")
+                            todoUtils.reset(userId,instruction)
+                            
                         }
                     }else{
                         //Il s'agit de get ou help, ou d'un moyen de planter le programme
@@ -62,6 +60,10 @@ let express = require('express'),
                             todoUtils.welcome_command(userId,username)
                         if(result.data.command.toLowerCase() == 'help')
                             todoUtils.help_command(userId)
+
+                        if(result.data.command.toLowerCase() == 'reset')
+                            todoUtils.sendMsg(userId,"Please specify the list to reset.")
+
                     }
                 }
 

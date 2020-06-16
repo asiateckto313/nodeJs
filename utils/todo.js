@@ -47,8 +47,8 @@ try {
         "*Resetting a list*\n\tTo reset a list which can either be the checked list or the todos one you can do it by following this syntax :\n\t"+
         "1. /reset todo (will reset, delete all of your todos)\n\t2. /reset check (will reset, delete all your todos checked)\n\n\t"+
         "*Please note :* If you have at least checked a todo to have the list of your todos checked, send /get\n\n\tPlease if any errors occurs let me know @superPablo. Thank you in advance and enjoy."
-        api.sendMessage(chatId,msg,{parse_mode: 'Markdown'})
-       // sendMsg(chatId,msg,)
+        api.sendMessage(chatId,msg,'Markdown')
+       
     },
     
     add_command = function(todolist,userId,todo){
