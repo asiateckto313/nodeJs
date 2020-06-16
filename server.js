@@ -46,7 +46,10 @@ let express = require('express'),
                         //Il s'agit de get ou help, ou d'un moyen de planter le programme
                         if(result.data.command.toLowerCase() == 'get'){
                             let msg = todoUtils.get_command(todolist,checkList,userId)
-                            todoUtils.sendMsg(userId, msg)
+                            if(msg !=="Your todos :\n")
+                                todoUtils.sendMsg(userId, msg)
+                            else{ todoUtils.sendMsg(userId,"You don't have any todo"); //todoUtils.reset(userId,todolist)
+								}
                         }else if (result.data.command.toLowerCase() == 'start')
                             todoUtils.welcome_command(userId,username)
                     }
