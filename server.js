@@ -61,9 +61,6 @@ let express = require('express'),
                         if(result.data.command.toLowerCase() == 'help')
                             todoUtils.help_command(userId)
 
-                        if(result.data.command.toLowerCase() == 'reset')
-                            todoUtils.sendMsg(userId,"Please specify the list to reset.")
-
                     }
                 }
 

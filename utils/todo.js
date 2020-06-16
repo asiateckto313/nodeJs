@@ -148,7 +148,7 @@ try {
             yesItis = false
     
         }else{ // L'utilisateur n'entre rien
-            if(command == 'add' || command == 'remove' || command == 'check' ) 
+            if(command == 'add' || command == 'remove' || command == 'check' || command == 'reset' ) 
             yesItis = false;
         }
         return yesItis
