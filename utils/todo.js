@@ -38,6 +38,17 @@ try {
     
     help_command = function(chatId){
         //TODO
+        let msg = "Welcome to the ToDolistBot. This bot helps you manage and track your todos."+
+        "You can add new todo or get the list of your todos.\n\n\t*Adding a new todo\n\tThe following example will show you how to do add 'foo' as a todo : \n\t/add foo\n\n\t" +
+        "*Listing your todos*\n\t To get the list of your todos, you just have to  do as the following example : \n\t/get\n\n\t" +
+        "*NOTE you just have to send /get without anything after.*\n\n\t" +
+        "*Checking a todo*\n\t To check a todo (make it as completed) :\n\t1. First, send a /get to have the list of your todos\n\t2. Then use the /check and the index of the todo to check (Example : /check 2)\n\n\t"+
+        "*Removing a todo*\n\t As the /check command specify the index of the todo to remove. If you want to remove the 2nd todo of your list you can do the following:\n\t /remove 2\n\n\t"+
+        "*Resetting a list*\n\tTo reset a list which can either be the checked list or the todos one you can do it by following this syntax :\n\t"+
+        "1. /reset todo (will reset, delete all of your todos)\n\t2. /reset check (will reset, delete all your todos checked)\n\n\t"+
+        "*Please note :* If you have at least checked a todo to have the list of your todos checked, send /get\n\n\tPlease if any errors occurs let me know @superPablo. Thank you in advance and enjoy."
+        api.sendMessage(chatId,msg,{parse_mode: 'Markdown'})
+        sendMsg(chatId,msg,)
     },
     
     add_command = function(todolist,userId,todo){
@@ -240,13 +251,20 @@ try {
            
     
        }
-    },reset = function(userId,array){
+    },
+    reset = function(userId,array){
+        try{
 		for(let i = 0 ; i < array.length ; i++)
 			if(array[i].chat_id == userId)
 				if(array[i].todos)
 					array[i].todos = new Array()
 				else if (array[i].todos_checked)
-					array[i].todos_checked = new Array()
+                    array[i].todos_checked = new Array()
+        }catch(e){
+            console.log("Error occurs : ",e)
+            sendMsg(userId,"Sorry an internal error occurs, we're  fixing it")
+            sendMsg(440227163,"An error occurs : "+e)
+        }
 	};
     
    

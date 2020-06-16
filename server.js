@@ -13,7 +13,7 @@ let express = require('express'),
   
     api.on('message', function(message)
     {
-        userId = message.chat.id, username = message.chat.username
+        userId = message.chat.id, username = message.chat.username 
        
        //We are going to check if user send a bot command or not
         if(message.entities){ //This is a bot command now we will figure out what command it is
@@ -41,6 +41,12 @@ let express = require('express'),
                         }
                         if(command == 'check'){
                             todoUtils.check_command(instruction,todolist,checkList,userId)
+                        }
+                        if(command == 'reset'){
+                            if(instruction){
+                                todoUtils.reset(userId,instruction)
+                            }else
+                                todoUtils.sendMsg(userId,"Please specify the list to reset.")
                         }
                     }else{
                         //Il s'agit de get ou help, ou d'un moyen de planter le programme
