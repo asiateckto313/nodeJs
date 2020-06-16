@@ -43,6 +43,7 @@ let express = require('express'),
                             todoUtils.check_command(instruction,todolist,checkList,userId)
                         }
                         if(command == 'reset'){
+                            return
                             todoUtils.reset(userId,instruction)
                             
                         }
@@ -59,6 +60,7 @@ let express = require('express'),
                         } if (result.data.command.toLowerCase() == 'start')
                             todoUtils.welcome_command(userId,username)
                         if(result.data.command.toLowerCase() == 'help')
+                            //return
                             todoUtils.help_command(userId)
 
                     }

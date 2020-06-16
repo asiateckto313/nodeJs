@@ -46,8 +46,12 @@ try {
         "*Removing a todo*\n\t As the /check command specify the index of the todo to remove. If you want to remove the 2nd todo of your list you can do the following:\n\t /remove 2\n\n\t"+
         "*Resetting a list*\n\tTo reset a list which can either be the checked list or the todos one you can do it by following this syntax :\n\t"+
         "1. /reset todo (will reset, delete all of your todos)\n\t2. /reset check (will reset, delete all your todos checked)\n\n\t"+
-        "*Please note :* If you have at least checked a todo to have the list of your todos checked, send /get\n\n\tPlease if any errors occurs let me know @superPablo. Thank you in advance and enjoy."
-        api.sendMessage(chatId,msg,'Markdown')
+        "*Please note :* If you have at least checked a todo to have the list of your todos checked, send /get\n\n\tPlease if any errors occurs let me know @superPablo_E. Thank you in advance and enjoy."
+        //sendMsg(chatId,msg,'Markdown')
+        api.sendMessage({chat_id:chatId,
+        text:msg/*, Search how to user Markdown as parse_mode
+        parse_mode:'Markdown'*/
+        })
        
     },
     
@@ -154,7 +158,15 @@ try {
         return yesItis
     }, 
     
-    sendMsg = function(chatId, text){
+    sendMsg = function(chatId, text,mode=undefined){
+        console.log("mode = ",mode)
+        if(mode)
+            api.sendMessage({
+                chat_id:chatId,
+                text: text,
+                
+            },{parse_mode:mode})
+        else
         api.sendMessage({
             chat_id:chatId,
             text: text
