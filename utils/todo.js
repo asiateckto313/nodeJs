@@ -269,6 +269,7 @@ try {
     
    
     module.exports = {
+        api,
         whichCommand,
         add_command,
         get_command,
@@ -280,7 +281,8 @@ try {
         check_command,
         verifyIndex,
         reset,
-        api
+        help_command
+        
     }
     
     events.on('Error', function(err){

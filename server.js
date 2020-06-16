@@ -58,8 +58,10 @@ let express = require('express'),
                                 todoUtils.sendMsg(userId,"You don't have any todo"); 
                                 todoUtils.reset(userId,todolist)
 							}
-                        }else if (result.data.command.toLowerCase() == 'start')
+                        } if (result.data.command.toLowerCase() == 'start')
                             todoUtils.welcome_command(userId,username)
+                        if(result.data.command.toLowerCase() == 'help')
+                            todoUtils.help_command(userId)
                     }
                 }
 
