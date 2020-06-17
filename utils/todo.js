@@ -94,24 +94,27 @@ try {
         let message = "";
         console.log(todolist.length)
         if(todolist.length ){
-            message += "Your todos :\n"
+           
             for (let j=0; j < todolist.length; j++){
-                if(userId == todolist[j].chat_id)
-                    message += serialize_msg(todolist[j])
+                //Si jamais l'utilisateur userId a des todos alors on formalise le msg
+                if(userId == todolist[j].chat_id && todolist[j].todos.length > 0)
+                    message += "Your todos :\n" + serialize_msg(todolist[j])
+                
+                    
 
             }
             if(checkedList.length)
             for (let j=0; j < checkedList.length; j++)
-                if(userId == checkedList[j].chat_id)
+                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
                     message += "\n\nYour todos_checked :\n" + serialize_msg(checkedList[j])
             
-                
+        
         }else{
             if(!checkedList.length)
                 message = "⚠️ You don't have any todo, please add one before showing the list."
             else{
                 for (let j=0; j < checkedList.length; j++){
-                    if(userId == checkedList[j].chat_id)
+                    if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
                         message += "Your todos_checked :\n" + serialize_msg(checkedList[j])
             }
         }
@@ -213,16 +216,16 @@ try {
                             if (checkedList[j].chat_id == userId){
                                 console.log("Ici")
                                 checkedList[j].todos_checked.push(todolist[i].todos[todoIndex-1])
-                                return;
+                                break;
                             }
-                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)[0]})
+                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
                     }
                     
 
                 }else
                     if(todolist[i].chat_id == userId){
                         console.log("Là")
-                        checkedList.push({chat_id:userId, todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)[0]})
+                        checkedList.push({chat_id:userId, todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
                         break;
                     }
             }
