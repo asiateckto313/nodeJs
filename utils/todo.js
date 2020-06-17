@@ -132,10 +132,10 @@ try {
             
                 for(let i = 0; i < tailleTodoList; i++)
                     if(todolist[i].chat_id == userId){
-                        if(todoIndex > todolist[i].todos.length) {sendMsg(userId,"Invalid index"); removed =false; break}
-                        todolist[i].todos.splice(todoIndex-1,1)
-                        if(!todolist[i].todos.length) todolist.splice(i,1)
-                        sendMsg(userId,"todo removed 👍")  
+                        if(todoIndex > todolist[i].todos.length) {sendMsg(userId,"Invalid index"); removed =false; return}
+                            todolist[i].todos.splice(todoIndex-1,1)
+                        //if(!todolist[i].todos.length) todolist.splice(i,1)
+                        sendMsg(userId,"Todo removed 👍")  
                         break;
                         //return todolist
                     }
@@ -215,14 +215,14 @@ try {
                                 checkedList[j].todos_checked.push(todolist[i].todos[todoIndex-1])
                                 return;
                             }
-                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
+                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)[0]})
                     }
                     
 
                 }else
                     if(todolist[i].chat_id == userId){
                         console.log("Là")
-                        checkedList.push({chat_id:userId, todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
+                        checkedList.push({chat_id:userId, todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)[0]})
                         break;
                     }
             }
