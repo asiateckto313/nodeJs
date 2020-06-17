@@ -167,7 +167,7 @@ try {
     }, 
     
     sendMsg = function(chatId, text,mode=undefined){
-        console.log("mode = ",mode)
+        //console.log("mode = ",mode)
         if(mode)
             api.sendMessage({
                 chat_id:chatId,
@@ -200,36 +200,74 @@ try {
     },
     
     check_command = function(todoIndex,todolist,checkedList,userId){
-
+        console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
        //TODO the same as the remove because it's based on the index too
-       console.log("verifyIndex = ",verifyIndex(todoIndex,todolist,userId))
+       //console.log("verifyIndex = ",verifyIndex(todoIndex,todolist,userId))
 
        if(verifyIndex(todoIndex,todolist,userId)){
+           //L'index entré est validé nous allons d'abord récupérer le todo
+           let todo_to_check = undefined
            
             for(let i = 0; i < tailleTodoList ; i ++){
+                if(todolist[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
+                    todo_to_check = todolist[i].todos[todoIndex-1]
+                    break;
+                }
+            }
+            if(todo_to_check !== undefined){
                 if(tailleCheckedList){
+                    //Bd (table checkedList non vide)
+                    let found = false;
+                    console.log("Bd non vide")
+                    //Nous allons effectuer une recherche pour savoir si l'utilisateur s'y trouve
+                    for(let i = 0; i < tailleCheckedList ; i ++){
+                        if(checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
+                            checkedList[i].todos_checked.push(todo_to_check)
+                            found = true
+                            break;
+                        }
+                    }
+                    if(!found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
+                    checkedList.push({chat_id:userId,todos_checked:[todo_to_check]})
+
+                }
+                }else{
+                    checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
+                    console.log("Bd vide, premier ajout")
+                }
+            }
+            
+
+
+                /*if(tailleCheckedList){
                     //Bd pour la checklist non vide
+                    console.log("Bd non vide")
+                    console.log(todolist)
                     if(todolist[i].chatId == userId){
                         //Vérifie si l'utilisateur x a déjà checked something
-                        for(let j= 0; j < tailleCheckedList; j++)
-                            if (checkedList[j].chat_id == userId && checkedList[j].todos_checked.length > 0){
+                        for(let j= 0; j < tailleCheckedList; j++){
+                            if (checkedList[j].chat_id == userId){
                                 console.log("Ici")
                                 checkedList[j].todos_checked.push(todolist[i].todos[todoIndex-1])
                                 //sendMsg(userId, "Added to the checked list. Please remove this todo from your todos")
                                 break;
-                            }else if (checkedList[j].todos_checked.length == 0)
-                                checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
+                            } 
+                            
+                        }
+                        //l'utilisateur effectue son premier check vu qu'il ne figure pas dans la bd
+                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
+
                     } 
                     
 
-                }else
+                }else // bd vide donc premier ajout
                     if(todolist[i].chat_id == userId){
                         console.log("Là")
                         checkedList.push({chat_id:userId, todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
                         break;
                     }
-            }
+            }*/
             console.log("checkedList : ",checkedList)
             sendMsg(userId, "Added to the checked list. Please remove this todo from your todos")
             return;
