@@ -37,7 +37,7 @@ try {
     },
     
     help_command = function(chatId){
-        //TODO
+        
         let msg = "Welcome to the ToDolistBot. This bot helps you manage and track your todos."+
         "You can add new todo or get the list of your todos.\n\n\t*Adding a new todo\n\tThe following example will show you how to do add 'foo' as a todo : \n\t/add foo\n\n\t" +
         "*Listing your todos*\n\t To get the list of your todos, you just have to  do as the following example : \n\t/get\n\n\t" +
@@ -49,22 +49,27 @@ try {
         "*Please note :* If you have at least checked a todo to have the list of your todos checked, send /get\n\n\tPlease if any errors occurs let me know @superPablo_E. Thank you in advance and enjoy."
         //sendMsg(chatId,msg,'Markdown')
         api.sendMessage({chat_id:chatId,
-        text:msg/*, Search how to user Markdown as parse_mode
+        text:msg/*,TODO Search how to user Markdown as parse_mode
         parse_mode:'Markdown'*/
         })
        
     },
     
     add_command = function(todolist,userId,todo){
-        
+        //Lorsqu'il y a au moins une personne qui a ajouté quelque chose 
         if(todolist.length){
+            //Si jamais cet utilisateur a déjà ajouté quelque chose on le cherche par son id
             for(let i = 0; i <todolist.length; i ++)
-                if(todolist[i].chat_id == userId)
+                if(todolist[i].chat_id == userId){
                     todolist[i].todos.push(todo)
+                    return //sors de la fonction
+                }
+            //Sinon si après recherche l'utilisateur ne se gittrouve pas dans la bd, alors c'est la première fois qu'il ajoute quelque chose
+            todolist.push({chat_id:userId,todos:[todo]})
             
             
         }else{
-            //Empty array, it is the first push
+            //Empty db, it is the first push
             todolist.push({chat_id:userId,todos:[todo]})
         }
         //fileUtils.saveTodo(todolist)
@@ -171,7 +176,8 @@ try {
             chat_id:chatId,
             text: text
         })
-    },verifyIndex = function(index,array,userId){
+    },
+    verifyIndex = function(index,array,userId){
         let tailleArray = array.length
         if(isNaN(parseInt(index))) return false;
         else{

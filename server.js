@@ -9,7 +9,7 @@ let express = require('express'),
     api = todoUtils.api, 
     todolist = new Array(), checkList = new Array(),userId="",
     eventListener = new EventEmitter();
-
+//todolist constitue ici la bd avec un utilisateur (userId) qui peut avoir un ou plusieurs todos
   
     api.on('message', function(message)
     {
