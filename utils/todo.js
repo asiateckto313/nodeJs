@@ -213,13 +213,14 @@ try {
                     if(todolist[i].chatId == userId){
                         //Vérifie si l'utilisateur x a déjà checked something
                         for(let j= 0; j < tailleCheckedList; j++)
-                            if (checkedList[j].chat_id == userId){
+                            if (checkedList[j].chat_id == userId && checkedList[j].todos_checked.length > 0){
                                 console.log("Ici")
                                 checkedList[j].todos_checked.push(todolist[i].todos[todoIndex-1])
+                                //sendMsg(userId, "Added to the checked list. Please remove this todo from your todos")
                                 break;
-                            }
-                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
-                    }
+                            }else if (checkedList[j].todos_checked.length == 0)
+                                checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
+                    } 
                     
 
                 }else
