@@ -39,7 +39,7 @@ try {
     help_command = function(chatId){
         
         let msg = "Welcome to the ToDolistBot. This bot helps you manage and track your todos."+
-        "You can add new todo or get the list of your todos.\n\n\t*Adding a new todo\n\tThe following example will show you how to do add 'foo' as a todo : \n\t/add foo\n\n\t" +
+        "You can add new todo or get the list of your todos.\n\n\t*Adding a new todo :*\n\tThe following example will show you how to do it, add 'foo' as a todo : \n\t/add foo\n\n\t" +
         "*Listing your todos*\n\t To get the list of your todos, you just have to  do as the following example : \n\t/get\n\n\t" +
         "*NOTE you just have to send /get without anything after.*\n\n\t" +
         "*Checking a todo*\n\t To check a todo (make it as completed) :\n\t1. First, send a /get to have the list of your todos\n\t2. Then use the /check and the index of the todo to check (Example : /check 2)\n\n\t"+
@@ -206,13 +206,16 @@ try {
            
             for(let i = 0; i < tailleTodoList ; i ++){
                 if(tailleCheckedList){
-                    if(todolist[i].chat_id == userId ){
+                    //Bd pour la checklist non vide
+                    if(todolist[i].chatId == userId){
+                        //Vérifie si l'utilisateur x a déjà checked something
                         for(let j= 0; j < tailleCheckedList; j++)
                             if (checkedList[j].chat_id == userId){
                                 console.log("Ici")
                                 checkedList[j].todos_checked.push(todolist[i].todos[todoIndex-1])
-                                break;
-                    }
+                                return;
+                            }
+                        checkedList.push({chat_id:userId,todos_checked:todolist[i].todos.slice(todoIndex-1,todoIndex)})
                     }
                     
 
