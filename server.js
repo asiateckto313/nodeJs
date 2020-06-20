@@ -76,7 +76,7 @@ api.on('inline.callback.query', function(message)
         if(result.data.command == 'reset'){
             if(result.data.instruction == 'todolist'){
                 todoUtils.reset(userId,todolist)
-
+                todoUtils.sendMsg(userId,'List has been reset')
             }
             if(result.data.instruction == 'checklist'){
                 todoUtils.reset(userId,checkList)
