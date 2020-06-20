@@ -1,5 +1,7 @@
 //const { api } = require('./utils/todo');
 
+const todo = require('./utils/todo');
+
 //const { whichCommand } = require('./utils/todo');
 
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
@@ -60,7 +62,7 @@ let  inlineKeyboard = {
             }
         ]
     ]
-};
+}, add_inline = false, check_inline = false, remove_inline = false;
 
 
 api.on('inline.result', function(message)
@@ -73,6 +75,7 @@ api.on('inline.callback.query', function(message)
 {
     let result = whichCommand(message), userId = message.from.id;
     if(!result.error){
+
         if(result.data.command == 'reset'){
             if(result.data.instruction == 'todolist'){
                 todoUtils.reset(userId,todolist)
@@ -80,13 +83,17 @@ api.on('inline.callback.query', function(message)
             }
             if(result.data.instruction == 'checklist'){
                 todoUtils.reset(userId,checkList)
+                todoUtils.sendMsg(userId,'List has been reset')
+
             }
             if(result.data.instruction == undefined)
                 todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",reset_option)
 
         }
+
         if(result.data.command == 'help')
             todoUtils.help_command(userId)
+
         if(result.data.command == 'get'){
             let msg = todoUtils.get_command(todolist,checkList,userId)
                             if(msg !=="")
@@ -96,10 +103,25 @@ api.on('inline.callback.query', function(message)
                               
         }
 
+        if(result.data.command == 'add'){
+            add_inline = true
+            todoUtils.sendMsg(userId,"Send now the todo to add")
+        }
+        if(result.data.command == 'remove'){
+            remove_inline = true
+            todoUtils.sendMsg(userId,"Send now the index of the to remove")
+
+        }
+        if( result.data.command == 'check'){
+                check_inline= true
+                todoUtils.sendMsg(userId,"Send now the index of the todo to check")
+
+        }
+
     }else{
-        console.log("result = ",message.data)
+        console.log("inline message.data = ",message.data)
     }
-    console.log("result = ", result)
+    console.log("inline result = ", result)
     // New incoming callback query
     //console.log(message); 
 });
@@ -107,8 +129,19 @@ api.on('inline.callback.query', function(message)
     api.on('message', function(message)
     {
         userId = message.chat.id, username = message.chat.username 
-       
-       
+       console.log(".on('message') : ", message)
+       if(add_inline){
+            todoUtils.add_command(todolist,userId,message.text.trim())
+            todoUtils.sendMsg(userId,"Todo added 👍")
+            add_inline = false
+       }else if(remove_inline){ 
+            todoUtils.remove_command(userId,todolist,parseInt(message.text.trim()))
+            remove_inline = false
+           
+       }else if(check_inline){
+        todoUtils.check_command(parseInt(message.text.trim()),todolist,checkList,userId)
+        check_inline = false
+       }else{
        //We are going to check if user send a bot command or not
         if(message.entities){ //This is a bot command now we will figure out what command it is
             console.log("bot command")
@@ -167,7 +200,9 @@ api.on('inline.callback.query', function(message)
             todoUtils.sendMsg(userId,"Not a bot command, please verify your syntax. Use the /help command to know the right syntax")
             console.log("Not a bot command please verify your syntax.")
         }
+    }
     });
+
     
     //We can offer the possibility to modify your wrong syntax
     
