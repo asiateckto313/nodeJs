@@ -52,11 +52,11 @@ let  inlineKeyboard = {
     inline_keyboard:[
         [{
             text:"My to do list",
-            callback_data: 'todolist'
+            callback_data: '/reset todolist'
         }],[
             {
                 text:"My checked list",
-                callback_data: 'checklist'
+                callback_data: '/reset checklist'
             }
         ]
     ]
@@ -73,8 +73,18 @@ api.on('inline.callback.query', function(message)
 {
     let result = whichCommand(message), userId = message.from.id;
     if(!result.error){
-        if(result.data.command == 'reset')
-            todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",reset_option)
+        if(result.data.command == 'reset'){
+            if(instruction == 'todolist'){
+                todoUtils.reset(userId,todolist)
+
+            }
+            if(instruction == 'checklist'){
+                todoUtils.reset(userId,checkList)
+            }
+            if(instruction == undefined)
+                todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",reset_option)
+
+        }
         if(result.data.command == 'help')
             todoUtils.help_command(userId)
         if(result.data.command == 'get'){
