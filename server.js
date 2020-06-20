@@ -101,7 +101,7 @@ api.on('inline.callback.query', function(message)
     }
     console.log("result = ", result)
     // New incoming callback query
-    //console.log(message);
+    //console.log(message); 
 });
 
     api.on('message', function(message)
