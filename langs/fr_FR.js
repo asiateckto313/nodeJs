@@ -4,6 +4,16 @@ let help_text = "Bienvenu(e) dans ToDolistBot. Ce bot vous permet de gérer vos 
 "\n\t\t*Ajouter une nouvelle tâche*"+"\n\t\tL'exemple suivant vous montre comment ajouter la tâche 'aller au marché':"+
 "\n\t\t/add aller au marché"+
 
+
+"\n\t\t*NOTE*: si vous souhaitez ajouter plusieurs tâches en même temps, il suffit de rentrer la première tâche comme précédemment et"+
+" les tâches qui suivent doivent être, chacune, à la ligne comme l'indique l'exemple suivant : "+
+"\n\t\tExemple: "+
+" /add aller au marché"+
+"\naller chez le dentiste"+
+"\nacheter des sacs poubelle"+
+"\nfaire la vaisselle"+
+
+
 "\n\n*Afficher la liste de vos tâches*"+
 "\n\t\tPour avoir la liste de vos tâches, il suffit d'envoyer la commande /get."+
 
@@ -30,7 +40,7 @@ let add_todo_text = "Envoyez moi la tâche à ajouter s'il vous plaît 😊", to
 
 welcome_command_text = function(username){
     return "Bonjour @"+ username+" et merci d'utiliser mon bot. N'hésitez pas à me signaler un quelconque problème. Amusez-vous bien 😏."},
-check_command_text = "👍Votre tâche a été ajoutée à la liste de tâches terminées. Maintenant veuillez supprimer cette tâche de la liste des tâches à faire s'il vous plaît.",invalid_index_text= "Index invalide", remove_command_text = "👍 Votre tâche a bien été supprimée 😊",
+check_command_text = "👍Votre tâche a été ajoutée à la liste de tâches terminées. Suppression de la tâche en cours...",invalid_index_text= "Index invalide", remove_command_text = "👍 Votre tâche a bien été supprimée 😊",
 serialize_msg_todolist_text = "Vos tâches à faire : \n",serialize_msg_checklist_text = "\n\nVos tâches accomplies : \n",check_empty_text= "⚠️ Vous n'avez aucune tâche, veuillez s'il vous plaît ajouter au moins une tâche avant d'afficher la liste.",
 remove_empty_todo = "😕Impossible de supprimer une liste ne contenant aucune tâche. Veuillez s'il vous plaît ajouter une tâche avant de la supprimer.",
 reset_success_text = "La liste a bien été réinitialisée", remove_index_text = "Envoyez moi le numéro de la tâche à supprimer s'il vous plaît",

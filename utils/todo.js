@@ -1,5 +1,7 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
+// TODO multi lines todo adding
+//TODO remove automatically a todo when checked
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
         token: 'TOKEN',
@@ -67,24 +69,35 @@ try {
         //parse_mode: 'Markdown'
     })
        
+    },multi_add = function(userId,todos){
+        let nbLigne = todos.split('\n').length, user= {chat_id: undefined,todos : []}
+        user.chat_id = userId
+        for(let i = 0; i <nbLigne; i++)
+            user.todos.push(todos.split('\n')[i])
+
+        return user
     },
     
     add_command = function(todolist,userId,todo){
+        let nbLigne = todo.split('\n').length
+        console.log("nbLigne = ",nbLigne)
         //Lorsqu'il y a au moins une personne qui a ajouté quelque chose 
         if(todolist.length){
             //Si jamais cet utilisateur a déjà ajouté quelque chose on le cherche par son id
             for(let i = 0; i <todolist.length; i ++)
                 if(todolist[i].chat_id == userId){
-                    todolist[i].todos.push(todo)
+                    console.log("trouvé")
+                    let temp = multi_add(userId,todo).todos
+                    todolist[i].todos = todolist[i].todos.concat(temp)
                     return //sors de la fonction
                 }
             //Sinon si après recherche l'utilisateur ne se gittrouve pas dans la bd, alors c'est la première fois qu'il ajoute quelque chose
-            todolist.push({chat_id:userId,todos:[todo]})
+            todolist.push(multi_add(userId,todo))
             
             
         }else{
             //Empty db, it is the first push
-            todolist.push({chat_id:userId,todos:[todo]})
+            todolist.push(multi_add(userId,todo))
         }
         //fileUtils.saveTodo(todolist)
         
@@ -219,7 +232,6 @@ try {
     check_command = function(todoIndex,todolist,checkedList,userId){
         console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
-       //TODO use the remove_command to delete automatically the todo (say it in the presentation)
 
        if(verifyIndex(todoIndex,todolist,userId)){
            //L'index entré est validé nous allons d'abord récupérer le todo
@@ -240,22 +252,27 @@ try {
                     for(let i = 0; i < tailleCheckedList ; i ++){
                         if(checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
                             checkedList[i].todos_checked.push(todo_to_check)
+                            remove_command(userId,todolist,todoIndex)
+
                             found = true
                             break;
                         }
                     }
                     if(!found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
                     checkedList.push({chat_id:userId,todos_checked:[todo_to_check]})
+                    remove_command(userId,todolist,todoIndex)
 
                 }
                 }else{
                     checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
+                    remove_command(userId,todolist,todoIndex)
+
                     console.log("Bd vide, premier ajout")
                 }
             }
             
             console.log("checkedList : ",checkedList)
-            sendMsg(userId, "Added to the checked list. Please remove this todo from your todos")
+            sendMsg(userId, "Added to the checked list. We are removing your todo")
             return;
                 
                     

@@ -1,14 +1,11 @@
+const { remove_command } = require("./todo");
+
 try {
     let fileUtils = require("./file"),
     fr_FR = require("../langs/fr_FR"),
     api= require("./todo").api,
-    todoUtils = require("./todo");
+    todoUtils = require("./todo"),
     
-
-    
-    whichCommand = function (message){
-        todoUtils.whichCommand(message)
-    },
     
     welcome_command = function(userId,username = undefined){
         todoUtils.sendMsg(userId, fr_FR.welcome_command_text(username))
@@ -121,17 +118,21 @@ try {
                     //Nous allons effectuer une recherche pour savoir si l'utilisateur s'y trouve
                     for(let i = 0; i < tailleCheckedList ; i ++){
                         if(checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
-                            checkedList[i].todos_checked.push(todo_to_check)
+                            checkedList[i].todos_checked.push(todo_to_check) //ajout du todo
+                            todoUtils.remove_command(userId,todolist,todoIndex)
                             found = true
                             break;
                         }
                     }
                     if(!found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
                     checkedList.push({chat_id:userId,todos_checked:[todo_to_check]})
+                    remove_command(userId,todolist,todoIndex)
 
                 }
                 }else{
                     checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
+                    remove_command(userId,todolist,todoIndex)
+
                     console.log("Bd vide, premier ajout")
                 }
             }
@@ -145,8 +146,6 @@ try {
        else
             todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
         return;
-
-
      
     },
     reset = function(userId,array){

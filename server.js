@@ -3,6 +3,8 @@
 const todo = require('./utils/todo');
 const { ifError } = require('assert');
 
+
+
 //const { whichCommand } = require('./utils/todo');
 
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
@@ -230,10 +232,10 @@ api.on('inline.callback.query', function(message)
     //console.log(message); 
 });
 
-    api.on('message', function(message)
-    {
+    api.on('message', function(message){
         //Maintenant que nous avons deux langues pour chaque commande l'on doit vérifier quelle est la langue active
         userId = message.chat.id, username = message.chat.username 
+
        console.log(".on('message') : ", message)
        if(add_inline){
            if(eng){
