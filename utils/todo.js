@@ -2,31 +2,35 @@
 //TODO really later think about add a due date for a todo to get reminded
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: '910248720:AAFtA54Nbfo6QyEBB5LEadjC5OI2Mg3Wc10',
+        token: 'TOKEN',
         updates: {
             enabled: true,
             get_interval: 1000
-    }})
+    }}),
+
     
     whichCommand = function (message){
         let command = undefined, instruction = undefined, tmp="";
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
+            console.log(instruction)
             for(let i = 1; i< instruction.length; i++)
                 tmp += instruction[i] + " "
             tmp = tmp.trim();
-    
-            if(!instruction){
+            if(!tmp){
+                console.log("ICi")
                 //Case of help or get command
-                return {error : false, data:{"command":command}}
+                return {error : false, "data":{"command":command}}
                 
             }else{
                 //Cas of add , remove or check
+                console.log("LA")
                 return {error : false, data:{"command":command,"instruction":tmp}}
             }
                 
         } catch (e) {
+            console.log("Dans le catch")
             try{
             if(message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
             if(message.data.split(' ').length == 2){
@@ -162,8 +166,9 @@ try {
     
     isTheRightSyntax = function(message){
         //De base on suppose que c'est la bonne syntaxe
-        let yesItis = true, result = whichCommand(message), 
-        command = result.data.command, instruction = result.data.instruction;
+        let yesItis = true, result = whichCommand(message);
+        console.log("result = ",result)
+        let command = result.data.command, instruction = result.data.instruction;
         command = command.toLowerCase()
         if(instruction){ // L'utilisateur entre du texte après avoir écrit ces commandes
             if(command == 'help' || command == 'get')
@@ -193,8 +198,10 @@ try {
     verifyIndex = function(index,array,userId){
         let tailleArray = array.length
         if(isNaN(parseInt(index))) return false;
+        else if (index <= 0 ) return false;
         else{
             if(tailleArray){ // at least one item
+                
                 for(let i = 0; i < tailleArray; i ++)
                     if(array[i].chat_id == userId){
                        if (index > array[i].todos.length) return false
@@ -212,8 +219,7 @@ try {
     check_command = function(todoIndex,todolist,checkedList,userId){
         console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
-       //TODO the same as the remove because it's based on the index too
-       //console.log("verifyIndex = ",verifyIndex(todoIndex,todolist,userId))
+       //TODO use the remove_command to delete automatically the todo (say it in the presentation)
 
        if(verifyIndex(todoIndex,todolist,userId)){
            //L'index entré est validé nous allons d'abord récupérer le todo
