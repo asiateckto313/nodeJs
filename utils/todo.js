@@ -8,7 +8,7 @@ try {
         updates: {
             enabled: true,
             get_interval: 1000
-    }}),
+    }}),fs = require("fs"),
 
     
     whichCommand = function (message){
@@ -69,16 +69,31 @@ try {
         //parse_mode: 'Markdown'
     })
        
-    },multi_add = function(userId,todos){
-        let nbLigne = todos.split('\n').length, user= {chat_id: undefined,todos : []}
-        user.chat_id = userId
+    },multi_add = function(userId,todos,isFrench){
+
+        let nbLigne = todos.split('\n').length, user= {chat_id: undefined,lang:undefined,todos : []}
+        user.chat_id = userId;
+        (isFrench !== undefined) ? ((isFrench == true) ? user.lang = "french" : user.lang = "english") : user.lang = user.lang
         for(let i = 0; i <nbLigne; i++)
             user.todos.push(todos.split('\n')[i])
 
         return user
+    },change_language_preference = function(userId,lang,users_preferences){
+        let taille_users_preferences = users_preferences.length, taille_checkList = checkList.length;
+        for(let i = 0; i< taille_users_preferences; i++)
+            if(users_preferences[i].chat_id == userId){
+                users_preferences[i].preferences.lang = lang
+                break;
+            }
+            for(let i = 0; i< taille_checkList; i++)
+            if(checkList[i].chat_id == userId){
+                checkList[i].preferences.lang = lang
+                break;
+            }
+            return;
     },
     
-    add_command = function(todolist,userId,todo){
+    add_command = function(todolist,userId,todo,french){
         let nbLigne = todo.split('\n').length
         console.log("nbLigne = ",nbLigne)
         //Lorsqu'il y a au moins une personne qui a ajouté quelque chose 
@@ -87,19 +102,20 @@ try {
             for(let i = 0; i <todolist.length; i ++)
                 if(todolist[i].chat_id == userId){
                     console.log("trouvé")
-                    let temp = multi_add(userId,todo).todos
+                    let temp = multi_add(userId,todo,french).todos
                     todolist[i].todos = todolist[i].todos.concat(temp)
+                    if(french) todolist[i].lang = 'french' 
+                    else todolist[i].lang='english'
                     return //sors de la fonction
                 }
             //Sinon si après recherche l'utilisateur ne se gittrouve pas dans la bd, alors c'est la première fois qu'il ajoute quelque chose
-            todolist.push(multi_add(userId,todo))
+            todolist.push(multi_add(userId,todo,french))
             
             
         }else{
             //Empty db, it is the first push
-            todolist.push(multi_add(userId,todo))
+            todolist.push(multi_add(userId,todo,french))
         }
-        //fileUtils.saveTodo(todolist)
         
         //TODO read the file todos.json and write it in the file
     }, 
@@ -320,7 +336,8 @@ try {
         verifyIndex,
         reset,
         help_command,
-        sendMessage_with_inlineKey
+        sendMessage_with_inlineKey,
+        change_language_preference
         
     }
     

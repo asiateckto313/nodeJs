@@ -35,8 +35,8 @@ let help_text = "Welcome to the ToDolistBot. This bot helps you manage and track
 
 "\n\n*Show command buttons*"+
 "Send the /commands (/add, /get, /check, /remove, /help) to see the same syntax in a designed button.\n\n\nPlease if any errors occurs let me know @superPablo_E. Thank you in advance and enjoy !! 😊😊",
-add_todo_text = "Send now the todo to add please 😊", todo_added_text = "👍 Todo added ☺️",
-
+add_todo_text = "Send now the todo to add please 😊", todo_added_text = "👍 Todo added ☺️",not_a_bot_command = "Not a bot command, please verify your syntax. Use the /help command to know the right syntax",
+wrong_syntax = "❌ Wrong syntax, please take a look to the right syntax by sending /help",
 welcome_command_text = function(username){
     return "Hello @"+ username+" and thank you for using my bot. Let me know if any problem occurs because it's my first bot. Hope you will enjoy 😏."},
 check_command_text = "Added to the checked list 👍👍. Please remove this todo from your todos.",invalid_index_text= "Invalid index ", remove_command_text = "Todo removed 👍👍 😊",
@@ -108,6 +108,8 @@ module.exports = {
     serialize_msg_checklist_text,
     check_empty_text,
     remove_empty_todo,
+    not_a_bot_command,
+    wrong_syntax,
     inlineKeyboard,
     reset_option
 }

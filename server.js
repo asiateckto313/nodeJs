@@ -10,8 +10,9 @@ const { ifError } = require('assert');
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
 
 let express = require('express'),
-    EventEmitter = require('events').EventEmitter,
+    fs = require('fs'),
     fr_FR = require("./langs/fr_FR"),
+    en_EN = require("./langs/en_EN"),
     todoUtils = require("./utils/todo"),
     todoUtils_fr = require("./utils/todo_fr"),
     fileUtils = require("./utils/file"),
@@ -19,7 +20,7 @@ let express = require('express'),
     server = require('http').createServer(app),
     api = todoUtils.api, 
     todolist = new Array(), checkList = new Array(),userId="",
-    eventListener = new EventEmitter(),eng = true, french = false;
+    eng = true, french = false;
 let  inlineKeyboard = {
     inline_keyboard: [
         [
@@ -85,6 +86,7 @@ let  inlineKeyboard = {
         ]
     ]
 },add_inline = false, check_inline = false, remove_inline = false, set_lang_inline = false;
+
 try{
 
 api.on('inline.result', function(message)
@@ -190,6 +192,7 @@ api.on('inline.callback.query', function(message)
 
                     }
                     if(result.data.instruction.trim().toLowerCase() == 'french'){eng = false; french = true; set_lang_inline = false
+                        fileUtils.saveTodo(todolist)
                         todoUtils.sendMsg(userId,"✅ Langue choisie : Français")
 
                     }
@@ -235,15 +238,19 @@ api.on('inline.callback.query', function(message)
     api.on('message', function(message){
         //Maintenant que nous avons deux langues pour chaque commande l'on doit vérifier quelle est la langue active
         userId = message.chat.id, username = message.chat.username 
+         fileUtils.getUserLang(userId,'./todos.txt').then((result)=>{
+             console.log("getUserLang result = ",result)
+         })
+        //console.log("userLang = ",userLang)
 
        console.log(".on('message') : ", message)
        if(add_inline){
            if(eng){
-                todoUtils.add_command(todolist,userId,message.text.trim())
+                todoUtils.add_command(todolist,userId,message.text.trim(),false)
                 todoUtils.sendMsg(userId,"Todo added 👍")
                 add_inline = false
            }else{
-            todoUtils.add_command(todolist,userId,message.text.trim())
+            todoUtils.add_command(todolist,userId,message.text.trim(),true)
                 todoUtils.sendMsg(userId,fr_FR.todo_added_text)
                 add_inline = false
            }
@@ -270,7 +277,7 @@ api.on('inline.callback.query', function(message)
         if(message.entities){ //This is a bot command now we will figure out what command it is
             console.log("bot command")
             if(!todoUtils.isTheRightSyntax(message))
-                todoUtils.sendMsg(userId, "❌ Wrong syntax, please take a look to the right syntax by sending /help")
+                (eng) ? todoUtils.sendMsg(userId, en_EN.wrong_syntax) : todoUtils.sendMsg(userId,fr_FR.wrong_syntax)
             else{
                 //Rigth syntax
                 let result = todoUtils.whichCommand(message)
@@ -280,8 +287,11 @@ api.on('inline.callback.query', function(message)
                         let command = result.data.command.toLowerCase()
                         //La propriété instruction existe, il s'agit de add, check ou remove
                         if(command == 'add'){
-                            
-                            todoUtils.add_command(todolist,userId,result.data.instruction)
+                            if(!eng)
+                            todoUtils.add_command(todolist,userId,result.data.instruction,true)
+                            else todoUtils.add_command(todolist,userId,result.data.instruction,false)
+                            fileUtils.saveTodo(todolist)
+
                             if(eng)
                                 todoUtils.sendMsg(userId, "Todo added 👍") 
                             else    todoUtils.sendMsg(userId,fr_FR.todo_added_text) 
@@ -341,11 +351,11 @@ api.on('inline.callback.query', function(message)
                         }
 
                     }
-                }
+                } 
 
             }
         }else{
-            todoUtils.sendMsg(userId,"Not a bot command, please verify your syntax. Use the /help command to know the right syntax")
+            (eng) ? todoUtils.sendMsg(userId,en_EN.not_a_bot_command) : todoUtils.sendMsg(userId,fr_FR.not_a_bot_command)
             console.log("Not a bot command please verify your syntax.")
         }
     }

@@ -37,7 +37,8 @@ let help_text = "Bienvenu(e) dans ToDolistBot. Ce bot vous permet de gérer vos 
 "\n\n\tEt surtout, n'hésitez pas à me contacter à l'adresse suivante : ";
 let help_text_suite = "@superPablo_E. Merci d'avance et amusez-vous bien ☺️"
 let add_todo_text = "Envoyez moi la tâche à ajouter s'il vous plaît 😊", todo_added_text = "👍 Votre tâche a bien été ajoutée ☺️", 
-
+not_a_bot_command = "Ceci n'est pas une commande bot, veuillez s'il vous plaît vérifier votre syntaxe. Envoyez /help afin de vous imprégner des bonnes syntaxes."
+wrong_syntax = "❌ Mauvaise syntaxe. Veuillez vous référer au /help pour les bonnes syntaxes.",
 welcome_command_text = function(username){
     return "Bonjour @"+ username+" et merci d'utiliser mon bot. N'hésitez pas à me signaler un quelconque problème. Amusez-vous bien 😏."},
 check_command_text = "👍Votre tâche a été ajoutée à la liste de tâches terminées. Suppression de la tâche en cours...",invalid_index_text= "Index invalide", remove_command_text = "👍 Votre tâche a bien été supprimée 😊",
@@ -63,5 +64,7 @@ module.exports = {
     reset_success_text,
     remove_index_text,
     check_index_text,
-    commands_button_text
+    wrong_syntax,
+    commands_button_text,
+    not_a_bot_command
 }

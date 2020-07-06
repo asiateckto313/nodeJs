@@ -177,7 +177,7 @@ try {
         ],
         [
             {
-                text: 'Terminé',
+                text: 'Cocher ✅',
                 callback_data: '/check'
             },{
                 text: 'Supprimer une tâche',
