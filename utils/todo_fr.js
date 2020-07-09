@@ -23,14 +23,40 @@ try {
        
     },
     
-    add_command = function(todolist,userId,todo){
-        todoUtils.add_command(todoUtils,userId,todo);
+    add_command = function(todolist,userId,todo,user_lang){
+        todoUtils.add_command(todolist,userId,todo,user_lang);
     }, 
     
     
     get_command = function(todolist,checkedList,userId){
         let message = "";
+        return new Promise((resolve, reject) => {
+            fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
+                console.log("res = ",res)
+                if(!res.error){
+                    let todos = res.todos, taille = todos.length;
+                    console.log("todos = ", todos )
+                    if(taille){
+                        message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(res)
+                        console.log(message)
+
+                        
+                        if(checkedList.length)
+                            for (let j=0; j < checkedList.length; j++)
+                                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
+                                    message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(checkedList[j])
+                       
+                    }
+                    resolve(message)
+                }
+            }).catch(e=>{
+                reject(e)
+            })
+        console.log("todo_fr.get_command invoked")
+        
+        })
         console.log(todolist.length)
+    
         if(todolist.length ){
            
             for (let j=0; j < todolist.length; j++){
@@ -59,6 +85,7 @@ try {
         
         
     }
+    console.log("todo_fr.get_command invoked")
     return message
     },
     remove_command = function(userId,todolist, todoIndex){

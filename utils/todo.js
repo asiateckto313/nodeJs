@@ -1,10 +1,9 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
-// TODO multi lines todo adding
-//TODO remove automatically a todo when checked
+const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt"
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: 'TOKEN',
+        token: '1292797073:AAEcuxdi5YyJYeMxCnO5U7yqZFtp01i4zZQ',
         updates: {
             enabled: true,
             get_interval: 1000
@@ -69,56 +68,29 @@ try {
         //parse_mode: 'Markdown'
     })
        
-    },multi_add = function(userId,todos,isFrench){
+    },
 
-        let nbLigne = todos.split('\n').length, user= {chat_id: undefined,lang:undefined,todos : []}
-        user.chat_id = userId;
-        (isFrench !== undefined) ? ((isFrench == true) ? user.lang = "french" : user.lang = "english") : user.lang = user.lang
-        for(let i = 0; i <nbLigne; i++)
-            user.todos.push(todos.split('\n')[i])
-
-        return user
-    },change_language_preference = function(userId,lang,users_preferences){
-        let taille_users_preferences = users_preferences.length, taille_checkList = checkList.length;
-        for(let i = 0; i< taille_users_preferences; i++)
-            if(users_preferences[i].chat_id == userId){
-                users_preferences[i].preferences.lang = lang
-                break;
+    change_language_preference = async function(userId,lang,todo_file){
+        try {
+            let datas = await fileUtils.read_file(todo_file), taille = datas.length;
+            console.log("datas : ",datas)
+            for(let i = 0; i< taille; i++)
+            if(datas[i].chat_id == userId){
+                datas[i].lang = lang
+                fileUtils.saveTodo(datas)
+                console.log("change_language_preference invoked")
+                return;
             }
-            for(let i = 0; i< taille_checkList; i++)
-            if(checkList[i].chat_id == userId){
-                checkList[i].preferences.lang = lang
-                break;
-            }
-            return;
+        } catch (error) {
+           console.error("change_language_preference error : ",error) 
+        }
+    
     },
     
-    add_command = function(todolist,userId,todo,french){
-        let nbLigne = todo.split('\n').length
-        console.log("nbLigne = ",nbLigne)
-        //Lorsqu'il y a au moins une personne qui a ajouté quelque chose 
-        if(todolist.length){
-            //Si jamais cet utilisateur a déjà ajouté quelque chose on le cherche par son id
-            for(let i = 0; i <todolist.length; i ++)
-                if(todolist[i].chat_id == userId){
-                    console.log("trouvé")
-                    let temp = multi_add(userId,todo,french).todos
-                    todolist[i].todos = todolist[i].todos.concat(temp)
-                    if(french) todolist[i].lang = 'french' 
-                    else todolist[i].lang='english'
-                    return //sors de la fonction
-                }
-            //Sinon si après recherche l'utilisateur ne se gittrouve pas dans la bd, alors c'est la première fois qu'il ajoute quelque chose
-            todolist.push(multi_add(userId,todo,french))
-            
-            
-        }else{
-            //Empty db, it is the first push
-            todolist.push(multi_add(userId,todo,french))
-        }
-        
-        //TODO read the file todos.json and write it in the file
-    }, 
+    add_command = function(todolist,userId,todo,user_lang){
+        console.log("todo = ",todo)
+        fileUtils.addUserTodo(userId,user_lang,todo,todo_file)
+    },
     serialize_msg = function(array){
         let message = ""
             if(array.todos){
@@ -130,12 +102,16 @@ try {
                     message += "✅: "+ (i+1) + " - " +array.todos_checked[i]+"\n"
     
             }
+            console.log(message)
+
+            console.log("todo.serialize_msg invoked")
         return message
     },
     
-    get_command = function(todolist,checkedList,userId){
-        let message = "";
+    get_command =  function(todolist,checkedList,userId){
+        let message = "",tmp = fileUtils.getUserTodos(userId,todo_file) ;
         console.log(todolist.length)
+        console.log("temp = ",tmp)
         if(todolist.length ){
            
             for (let j=0; j < todolist.length; j++){
@@ -200,7 +176,7 @@ try {
         let command = result.data.command, instruction = result.data.instruction;
         command = command.toLowerCase()
         if(instruction){ // L'utilisateur entre du texte après avoir écrit ces commandes
-            if(command == 'help' || command == 'get')
+            if(command == 'help' || command == 'get' || command == 'start')
             yesItis = false
     
         }else{ // L'utilisateur n'entre rien
