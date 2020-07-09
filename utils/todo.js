@@ -3,7 +3,7 @@
 const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt"
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: '1292797073:AAEcuxdi5YyJYeMxCnO5U7yqZFtp01i4zZQ',
+        token: 'TOKEN',
         updates: {
             enabled: true,
             get_interval: 1000
