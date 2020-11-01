@@ -1,8 +1,7 @@
 const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
     checked_file = __dirname + 'checked.json';
 
-let jsonfile = require('jsonfile'),  fs = require("fs"), todoUtils = require("./todo");
-const { Console } = require('console');
+let fs = require("fs"), todoUtils = require("./todo");
 
 
 saveTodo =   function(todolist){
@@ -45,7 +44,7 @@ saveTodo =   function(todolist){
 }, getUserLang = async function(userId,todo_file){
   try {
     let datas = await read_file(todo_file),taille = datas.length;
-    console.log(datas)
+    // console.log(datas)
     for(let i = 0; i< taille; i++)
       if(datas[i].chat_id == userId)
         return {error:false,data:datas[i].lang}
@@ -83,12 +82,14 @@ saveTodo =   function(todolist){
   return user
 } ,addUserTodo = async function (userId,user_lang,todo,todo_file){
   try {
+    // console.log("addUser debut")
     let todolist = await read_file(todo_file),taille_bd = todolist.length;
     let temp = multi_add(userId,todo,user_lang).todos
-    //console.log("todolist = ",todolist)
+    // console.log("todo = ",todo)
     if(taille_bd){
       for(let user of todolist){
         if(user.chat_id == userId){
+          if (Array.isArray(todo)) {console.log("array");user.todos = todo; saveTodo(todolist); return}
           user.todos = user.todos.concat(temp)
           //user.todos.push(todo)
           saveTodo(todolist)
@@ -114,8 +115,29 @@ saveTodo =   function(todolist){
   
 
   } catch (error) {
-    return {error: true,error_msg:error}
-    console.error(error)
+    let todolist = await read_file(todo_file),taille_bd = todolist.length;
+    console.error('addUser error = ', error.message)
+    if(taille_bd){
+      for(let user of todolist){
+        if(user.chat_id == userId){
+          if (Array.isArray(todo)) {user.todos = todo; saveTodo(todolist); return}
+          user.todos = user.todos.concat(temp)
+          //user.todos.push(todo)
+          saveTodo(todolist)
+          console.log("addUserTodo invoked, user found in db")
+          return
+        }
+      }
+      console.log("Updated invoked, user was not found new adding ")
+      return
+    }else{
+      todolist.push( multi_add(userId,todo,user_lang) )
+      // todolist.push({chat_id:userId,lang:user_lang,todos:[todo]})
+      console.log("Updated invoked, empty db first adding")
+      saveTodo(todolist)
+      return 
+
+    }
   }
   
 }, addNewComer = async function(userId,todo_file){

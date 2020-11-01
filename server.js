@@ -134,7 +134,8 @@ api.on('message', function(message){
     
     if(username == undefined || username == "-") username = message.chat.first_name
 
-    fileUtils.getUserLang(userId,todo_file).then(result => {
+    fileUtils.getUserLang(userId,todo_file).then(async (result) => {
+        //Récupération du langage défini par l'utilisateur
         console.log("getUserLang result = ",result)
         if(!result.error){
             user_lang = result.data
@@ -176,7 +177,9 @@ api.on('message', function(message){
                                 //syntaxe brute partie française
                                 //Si l'on a une ou des instructions il s'agit des commandes add, check, remove, reset
                                 if(instruction){
-                                    
+                                    todolist = await fileUtils.getUserTodos(userId, fileUtils.todo_file)
+                                    todolist = todolist.todos
+
                                     if(command == 'add'){
                                 
                                         todoUtils_fr.add_command(todolist,userId,instruction,user_lang)
@@ -194,7 +197,7 @@ api.on('message', function(message){
                                     if(command == "remove")
                                     todoUtils_fr.remove_command(userId,todolist,instruction) // Update the todolist array by removing one item
 
-                                    if(command == "check")
+                                    if(command == "check") console.log(checkList)
                                     todoUtils_fr.check_command(instruction,todolist,checkList,userId)
 
                                     if(command == 'reset'){
@@ -212,7 +215,7 @@ api.on('message', function(message){
                                     if(command == 'get'){
                                         todoUtils_fr.get_command(todolist,checkList,userId).then(msg => {
                                             console.log("msg = ",msg)
-                                            if(msg != "")
+                                            if(msg !== "")
                                                 todoUtils.sendMsg(userId,msg)
                                             else
                                                 todoUtils.sendMsg(userId,fr_FR.check_empty_text)

@@ -3,11 +3,11 @@
 const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt"
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: '1292797073:AAEcuxdi5YyJYeMxCnO5U7yqZFtp01i4zZQ',
+        token: '910248720:AAFtA54Nbfo6QyEBB5LEadjC5OI2Mg3Wc10',
         updates: {
             enabled: true,
             get_interval: 1000
-    }}),fs = require("fs"),
+    }}),fs = require("fs");
 
     
     whichCommand = function (message){
@@ -15,18 +15,18 @@ try {
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
-            console.log(instruction)
+            // console.log(instruction)
             for(let i = 1; i< instruction.length; i++)
                 tmp += instruction[i] + " "
             tmp = tmp.trim();
             if(!tmp){
-                console.log("ICi")
+                // console.log("ICi")
                 //Case of help or get command
                 return {error : false, "data":{"command":command}}
                 
             }else{
                 //Cas of add , remove or check
-                console.log("LA")
+                // console.log("LA")
                 return {error : false, data:{"command":command,"instruction":tmp}}
             }
                 
@@ -201,12 +201,13 @@ try {
         })
     },
     verifyIndex = function(index,array,userId){
+        // console.log("index =",index)
         let tailleArray = array.length
-        if(isNaN(parseInt(index))) return false;
+        if(isNaN(parseInt(index.trim()))) return false;
         else if (index <= 0 ) return false;
         else{
             if(tailleArray){ // at least one item
-                
+                console.log("verifINDEX HERE")
                 for(let i = 0; i < tailleArray; i ++)
                     if(array[i].chat_id == userId){
                        if (index > array[i].todos.length) return false

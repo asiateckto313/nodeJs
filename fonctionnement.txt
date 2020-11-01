@@ -1,0 +1,23 @@
+Concevoir un bot de gestion des tâches quotidiennes par l'ajout, la suppression, le checking et le listing. Ce bot se fera en utilisant les technos node.js et telegram permettant à tout utilisateur n'ayant pas assez de mémoire de pouvoir avoir un robot de gestion sans avoir à télécharger une application qui va prendre de la place dans son téléphone (telegram users of course). Ce bot aura deux modes de fonctionnement : 
+	1. Mode brut(e) : avec les syntaxes 
+	2. Mode non brut(e) : avec les boutons
+
+Première version : 
+	Lorsque l'utilisateur entre, démarre le bot l'on lui souhaite la bienvenue et lui propose déjà de choisir la langue (pour l'instant français ou anglais). Une fois la langue choisie, on peut lui afficher le menu qui sera envoyé automatiquement à la fin de toute action de sorte à éviter à l'utilisateur de procéder à l'utilisateur d'utiliser la syntaxe brute sans pour autant retirer le mode brut pour ces utilisateurs qui aimeront 
+
+	Penser à un menu help un peu intéractif : lorsque l'utilisateur envoie /help à la manière de Expense Bot et selon la langue choisie on lui demande le help de quelle commande il souhaite avoir sinon on lui envoie le help total
+
+Deuxième version : (se former d'abord sur le inlineKeyBoard)
+	Elle se fera en deux sous étapes : 
+	1. Optimisation du code de la v1
+	2. La logique reste la même seulement qu'au lieu d'envoyer à chaque fois les boutons de commandes après que l'utilisateur ait terminé une action, nous aurons les boutons déjà dans le clavier
+
+Fonctionnalités à mettre en place : 
+/TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
+//TODO really later think about add a due date for a todo to get reminded
+//TODO ajouter une commande /newpost se basant sur l'id du owner (moi) pour pouvoir envoyer un message à tout mes abonnés
+//TODO Enregistrer les préférences par utilisateurs (langue, reminder frequency)
+//TODO ajouter le temps auquel un todo a été ajouté ou marqué comme terminé
+//TODO faire une vérification avant la fin de la journée pour chaque utilisateur afin de savoir s'il a terminé toutes
+//les tâches et lui envoyer un gif de félécitations
+//TODO penser à faire des catégories pour les todos; permettra de lister pour telle catégorie les todos qui y sont

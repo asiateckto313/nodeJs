@@ -1,3 +1,4 @@
+const file = require("./file");
 const { remove_command } = require("./todo");
 
 try {
@@ -32,10 +33,10 @@ try {
         let message = "";
         return new Promise((resolve, reject) => {
             fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
-                console.log("res = ",res)
+                // console.log("res = ",res)
                 if(!res.error){
                     let todos = res.todos, taille = todos.length;
-                    console.log("todos = ", todos )
+                    // console.log("todos = ", todos )
                     if(taille){
                         message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(res)
                         console.log(message)
@@ -88,20 +89,37 @@ try {
     console.log("todo_fr.get_command invoked")
     return message
     },
-    remove_command = function(userId,todolist, todoIndex){
-    
-        let tailleTodoList = todolist.length
-        if(tailleTodoList){
+    remove_command = async  function(userId,todolist, todoIndex){
+       try {  
+            todoIndex = parseInt(todoIndex)
+            if(isNaN(todoIndex) ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
+            if( todoIndex <= 0 ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
+
+            else {
+                let tailleTodoList = todolist.length, user_lang = await fileUtils.getUserLang(userId, fileUtils.todo_file);
+                user_lang = user_lang.data;
+                todolist.splice(todoIndex-1,1)
+                console.log(todolist)
+                fileUtils.addUserTodo(userId, user_lang, todolist, fileUtils.todo_file)
+            }
+            console.log("remove_command invoked")
+        } catch (e) {
+            console.log("remove_command error invoked")
+            console.error(e.message)
+        }
+        /*if(tailleTodoList){
             
             todoIndex = parseInt(todoIndex)
             if(isNaN(todoIndex) ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
             if( todoIndex <= 0 ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
+            // if( todoIndex > tailleTodoList) todoUtils.sendMsg(userId, fr_FR.invalid_index_text)
             else{
             
                 for(let i = 0; i < tailleTodoList; i++)
                     if(todolist[i].chat_id == userId){
                         if(todoIndex > todolist[i].todos.length) {todoUtils.sendMsg(userId,fr_FR.invalid_index_text); removed =false; return}
                             todolist[i].todos.splice(todoIndex-1,1)
+                            fileUtils.addUserTodo(userId,user_lang,todolist[i].todos,fileUtils.todo_file)
                         //if(!todolist[i].todos.length) todolist.splice(i,1)
                         todoUtils.sendMsg(userId,fr_FR.remove_command_text)  
                         break;
@@ -111,7 +129,7 @@ try {
                     
         }else{
             todoUtils.sendMsg(userId,fr_FR.remove_empty_todo)
-        }
+        }*/
     
     },
     
@@ -122,14 +140,14 @@ try {
     
     
     check_command = function(todoIndex,todolist,checkedList,userId){
-        console.log("userid = ",userId)
+        // console.log("userid = ",userId)
         console.log("FR_CHECK")
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
        //TODO use the remove_command to delete automatically the todo (say it in the presentation)
 
        if(todoUtils.verifyIndex(todoIndex,todolist,userId)){
            //L'index entré est validé nous allons d'abord récupérer le todo
-           let todo_to_check = undefined
+           let todo_to_check = todolist[todoIndex - 1];
            
             for(let i = 0; i < tailleTodoList ; i ++){
                 if(todolist[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
@@ -138,6 +156,7 @@ try {
                 }
             }
             if(todo_to_check !== undefined){
+                // console.log('todo_to_check = ', todo_to_check)
                 if(tailleCheckedList){
                     //Bd (table checkedList non vide)
                     let found = false;
@@ -157,6 +176,7 @@ try {
 
                 }
                 }else{
+                    // console.log('u = ', todolist)
                     checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
                     remove_command(userId,todolist,todoIndex)
 
