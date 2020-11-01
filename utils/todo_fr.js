@@ -1,5 +1,3 @@
-const file = require("./file");
-const { remove_command } = require("./todo");
 
 try {
     let fileUtils = require("./file"),

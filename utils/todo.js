@@ -1,15 +1,16 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
-const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt"
+const path = require('path');
+
+const todo_file = path.resolve('../todos.txt');
 try {
+    console.log("todo_file = ",todo_file)
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
         token: '910248720:AAFtA54Nbfo6QyEBB5LEadjC5OI2Mg3Wc10',
-
-        token: 'TOKEN',
         updates: {
             enabled: true,
             get_interval: 1000
-    }}),fs = require("fs");
+    }});
 
     
     whichCommand = function (message){
