@@ -4,6 +4,8 @@ const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todo
 try {
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
         token: '910248720:AAFtA54Nbfo6QyEBB5LEadjC5OI2Mg3Wc10',
+
+        token: 'TOKEN',
         updates: {
             enabled: true,
             get_interval: 1000
