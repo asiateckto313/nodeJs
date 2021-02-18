@@ -1,5 +1,7 @@
 const path = require('path');
+const { initBd } = require('./utils/file');
 const todo_file = path.resolve('./todos.txt');
+const messages_file = path.resolve ( "./messages.txt" );
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
 
 
@@ -80,6 +82,7 @@ let  inlineKeyboard = {
     ]
 },add_inline = false, check_inline = false, remove_inline = false, set_lang_inline = false,username = undefined;
 
+initBd(todo_file, messages_file)
 
 try{
 
@@ -275,9 +278,10 @@ try{
             (user_lang == "english") ? todoUtils.help_command(userId) : todoUtils_fr.help_command(userId)
         }*/
     });
-
+    
     api.on( 'message', function( message ) {
         // A la réception d'un message
+        console.log (message)
         let user_lang = undefined;
         userId = message.chat.id, username = message.chat.username
         
@@ -343,12 +347,13 @@ try{
 
                                             // todoUtils.sendMsg(userId,fr_FR.todo_added_text)
                                         
-                                        if ( command === "reset") {console.log ( "reset")}
+                                        if ( command === "reset") { console.log ( "reset") }
+
                                         if ( command == "remove")
-                                        todoUtils_fr.remove_command(userId,todolist,instruction) // Update the todolist array by removing one item
+                                            todoUtils_fr.remove_command( userId , todolist, instruction ) // Update the todolist array by removing one item
 
                                         if ( command == "check")
-                                        todoUtils_fr.check_command(instruction,todolist,checkList,userId)
+                                        todoUtils_fr.check_command( instruction , todolist , checkList , userId )
 
                                     } else  {  // Sans instruction il s'agit des syntaxes get, commands et help
                                         if ( command == 'reset' ) {

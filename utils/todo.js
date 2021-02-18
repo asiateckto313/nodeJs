@@ -7,13 +7,16 @@ const en_EN = require('../langs/en_EN');
 const todo_file = path.resolve('./todos.txt');
 
 try {
-    let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: token ||'token_ID',
-        updates: {
-            enabled: true,
-            get_interval: 1000
+    let fileUtils = require("./file"),
+    telegram = require('telegram-bot-api'),
+    api = new telegram({
+        token : token ||'token_ID',
+        updates : {
+            enabled : true,
+            get_interval : 1000
         }
-    }),
+    });
+    api.on( 'RequestError' , ( err ) => console.log( "api error = ", err ) )
 
     
     whichCommand = function ( message ) {
@@ -25,7 +28,7 @@ try {
             for( let i = 1; i < instruction.length; i++ )
                 tmp += instruction[ i ] + " "
             tmp = tmp.trim();
-            
+
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command

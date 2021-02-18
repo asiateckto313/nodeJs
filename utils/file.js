@@ -1,27 +1,57 @@
 
 const path = require('path');
 const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
-const checked_file = __dirname + 'checked.json';
 
-let fs = require("fs"), todoUtils = require("./todo");
+let fs = require("fs"), todoUtils = require("./todo"),
 
+isFileExists = function (filePath) {
+  try {
+    if (fs.existsSync(filePath)) {
+      //file exists
+      return true
+    }
+  } catch(err) {
+    return false
+  }
+} ,
 
+initBd = function ( todo_file, message_file ) { 
+  if (!todo_file || !message_file) {
+    console.log("L'un des paramètres est manquant, veuillez renseigner les deux paramètres svp")
+    return
+  }
+  if ( ! isFileExists( todo_file ) ) {
+    // Si le fichier todo.txt n'existe pas on le crée
+    fs.appendFile( todo_file , '[]' , ( err ) => {
+      if ( err ) {
+        console.log("erreur lors de la création du fichier : ", err)
+        return
+      }
+      console.log(" Création du fichier réussie ")
+    })
+  
+  }
 
+  if ( ! isFileExists( message_file ) ) {
+    // Si le fichier todo.txt n'existe pas on le crée
+    fs.appendFile( message_file , '[]' , ( err ) => {
+      if ( err ) {
+          console.log("erreur lors de la création du fichier : ", err)
+          return
+      }
+      console.log(" Création du fichier réussie ")
+    })
+  }
+
+  console.log('InitBd invoked')
+} ,
 saveTodo =   function(todolist){
   try {
     fs.writeFile(todo_file, JSON.stringify(todolist), (err) => {
       if (err) console.log("We've got an error : ", err)
       console.log('The file has been saved!');
-      });
-    /*fs.open(todo_file, 'w', (err, fd) => {
-      if (err) throw err;
-      fs.appendFile(fd, JSON.stringify(todolist), 'utf8', (err) => {
-        fs.close(fd, (err) => {
-          if (err) throw err;
-        });
-        if (err) throw err;
-      });
-    });*/
+    });
+    
   } catch (error) {
     console.log("saveTodoErr : ",error)
   }
@@ -184,6 +214,8 @@ read_file,
 todo_file,
 addUserTodo,
 addNewComer,
+isFileExists,
 fs,
-setUserLang
+setUserLang,
+initBd
 }
