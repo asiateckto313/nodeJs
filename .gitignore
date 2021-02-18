@@ -3,3 +3,5 @@ package-lock.json
 todos.txt
 .todos 2.json.icloud
 ancienne_version.js
+.env
+messages.txt

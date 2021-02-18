@@ -1,49 +1,52 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
 const path = require('path');
+const { token } = require('../config/envparam');
+const en_EN = require('../langs/en_EN');
 
-const todo_file = path.resolve('../todos.txt');
+const todo_file = path.resolve('./todos.txt');
+
 try {
-    console.log("todo_file = ",todo_file)
     let fileUtils = require("./file"),telegram = require('telegram-bot-api'),api = new telegram({
-        token: '910248720:AAFtA54Nbfo6QyEBB5LEadjC5OI2Mg3Wc10',
+        token: token ||'token_ID',
         updates: {
             enabled: true,
             get_interval: 1000
-    }});
+        }
+    }),
 
     
     whichCommand = function (message){
-        let command = undefined, instruction = undefined, tmp="";
+        let command = undefined, instruction = undefined, tmp = "";
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
-            // console.log(instruction)
-            for(let i = 1; i< instruction.length; i++)
+            // console.log(instruction) // vérification préalable de l'existence d'une instruction
+            for( let i = 1; i < instruction.length; i++ )
                 tmp += instruction[i] + " "
             tmp = tmp.trim();
-            if(!tmp){
+            if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command
-                return {error : false, "data":{"command":command}}
+                return { error : false, "data":{ "command" : command } }
                 
-            }else{
-                //Cas of add , remove or check
+            } else {
+                //Case of add , remove or check
                 // console.log("LA")
                 return {error : false, data:{"command":command,"instruction":tmp}}
             }
                 
-        } catch (e) {
+        } catch (e) { // La commande a été envoyé par le biais des boutons
             console.log("Dans le catch")
             try{
-            if(message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
-            if(message.data.split(' ').length == 2){
+            if ( message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
+            if ( message.data.split(' ').length == 2){
                 command = message.data.split(' ')[0].trim().split('/')[1]
                 instruction = message.data.split(' ')[1]
                 
             }
             return {error:false,"data":{"command":command,"instruction":instruction}}
-        }catch(f){
+        }catch ( f ){
             return {error : true, error_msg:f}
         }            
         }
@@ -78,7 +81,7 @@ try {
             let datas = await fileUtils.read_file(todo_file), taille = datas.length;
             console.log("datas : ",datas)
             for(let i = 0; i< taille; i++)
-            if(datas[i].chat_id == userId){
+            if ( datas[i].chat_id == userId){
                 datas[i].lang = lang
                 fileUtils.saveTodo(datas)
                 console.log("change_language_preference invoked")
@@ -96,7 +99,7 @@ try {
     },
     serialize_msg = function(array){
         let message = ""
-            if(array.todos){
+            if ( array.todos){
                 for(let i = 0; i < array.todos.length; i++)
                     message += "🕒: "+(i+1) + " - " +array.todos[i]+"\n"
     
@@ -112,31 +115,57 @@ try {
     },
     
     get_command =  function(todolist,checkedList,userId){
+        let msg = "";
+        return new Promise((resolve, reject) => {
+            fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
+                // console.log("res = ",res)
+                if ( !res.error){
+                    let todos = res.todos, taille = todos.length;
+                    // console.log("todos = ", todos )
+                    if ( taille){
+                        msg += en_EN.serialize_msg_todolist_text + todoUtils.serialize_msg(res)
+                        console.log(message)
+
+                        
+                        if ( checkedList.length)
+                            for (let j=0; j < checkedList.length; j++)
+                                if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
+                                msg += en_EN.serialize_msg_todolist_text + todoUtils.serialize_msg(checkedList[j])
+                       
+                    }
+                    resolve(msg)
+                }
+            }).catch(e=>{
+                reject(e)
+            })
+        console.log("get_command invoked")
+        
+        });
         let message = "",tmp = fileUtils.getUserTodos(userId,todo_file) ;
         console.log(todolist.length)
         console.log("temp = ",tmp)
-        if(todolist.length ){
+        if ( todolist.length ){
            
             for (let j=0; j < todolist.length; j++){
                 //Si jamais l'utilisateur userId a des todos alors on formalise le msg
-                if(userId == todolist[j].chat_id && todolist[j].todos.length > 0)
+                if ( userId == todolist[j].chat_id && todolist[j].todos.length > 0)
                     message += "Your todos :\n" + serialize_msg(todolist[j])
                 
                     
 
             }
-            if(checkedList.length)
+            if ( checkedList.length)
             for (let j=0; j < checkedList.length; j++)
-                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
+                if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
                     message += "\n\nYour todos_checked :\n" + serialize_msg(checkedList[j])
             
         
         }else{
-            if(!checkedList.length)
+            if ( !checkedList.length)
                 message = "⚠️ You don't have any todo, please add one before showing the list."
             else{
                 for (let j=0; j < checkedList.length; j++){
-                    if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
+                    if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
                         message += "Your todos_checked :\n" + serialize_msg(checkedList[j])
             }
         }
@@ -148,18 +177,18 @@ try {
     remove_command = function(userId,todolist, todoIndex){
     
         let tailleTodoList = todolist.length
-        if(tailleTodoList){
+        if ( tailleTodoList){
             
             todoIndex = parseInt(todoIndex)
-            if(isNaN(todoIndex) ) sendMsg(userId,"Invalid index")
-            if( todoIndex <= 0 ) sendMsg(userId,"Can not remove empty todos")
+            if ( isNaN(todoIndex) ) sendMsg(userId,"Invalid index")
+            if (  todoIndex <= 0 ) sendMsg(userId,"Can not remove empty todos")
             else{
             
                 for(let i = 0; i < tailleTodoList; i++)
-                    if(todolist[i].chat_id == userId){
-                        if(todoIndex > todolist[i].todos.length) {sendMsg(userId,"Invalid index"); removed =false; return}
+                    if ( todolist[i].chat_id == userId){
+                        if ( todoIndex > todolist[i].todos.length) {sendMsg(userId,"Invalid index"); removed =false; return}
                             todolist[i].todos.splice(todoIndex-1,1)
-                        //if(!todolist[i].todos.length) todolist.splice(i,1)
+                        //if ( !todolist[i].todos.length) todolist.splice(i,1)
                         sendMsg(userId,"Todo removed 👍")  
                         break;
                         //return todolist
@@ -178,12 +207,12 @@ try {
         console.log("result = ",result)
         let command = result.data.command, instruction = result.data.instruction;
         command = command.toLowerCase()
-        if(instruction){ // L'utilisateur entre du texte après avoir écrit ces commandes
-            if(command == 'help' || command == 'get' || command == 'start')
+        if ( instruction){ // L'utilisateur entre du texte après avoir écrit ces commandes
+            if ( command == 'help' || command == 'get' || command == 'start')
             yesItis = false
     
         }else{ // L'utilisateur n'entre rien
-            if(command == 'add' || command == 'remove' || command == 'check' || command == 'reset' ) 
+            if ( command == 'add' || command == 'remove' || command == 'check') 
             yesItis = false;
         }
         return yesItis
@@ -191,7 +220,7 @@ try {
     
     sendMsg = function(chatId, text,mode=undefined){
         //console.log("mode = ",mode)
-        if(mode)
+        if ( mode)
             api.sendMessage({
                 chat_id:chatId,
                 text: text,
@@ -206,19 +235,19 @@ try {
     verifyIndex = function(index,array,userId){
         // console.log("index =",index)
         let tailleArray = array.length
-        if(isNaN(parseInt(index.trim()))) return false;
+        if ( isNaN(parseInt(index.trim()))) return false;
         else if (index <= 0 ) return false;
         else{
-            if(tailleArray){ // at least one item
+            if ( tailleArray){ // at least one item
                 console.log("verifINDEX HERE")
                 for(let i = 0; i < tailleArray; i ++)
-                    if(array[i].chat_id == userId){
+                    if ( array[i].chat_id == userId){
                        if (index > array[i].todos.length) return false
                     }
                 
             }else{ //empty
-                if(index < tailleArray) return false
-                if(index > tailleArray) return false
+                if ( index < tailleArray) return false
+                if ( index > tailleArray) return false
             }
         }
         return true
@@ -229,24 +258,24 @@ try {
         console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
 
-       if(verifyIndex(todoIndex,todolist,userId)){
+       if ( verifyIndex(todoIndex,todolist,userId)){
            //L'index entré est validé nous allons d'abord récupérer le todo
            let todo_to_check = undefined
            
             for(let i = 0; i < tailleTodoList ; i ++){
-                if(todolist[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
+                if ( todolist[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
                     todo_to_check = todolist[i].todos[todoIndex-1]
                     break;
                 }
             }
-            if(todo_to_check !== undefined){
-                if(tailleCheckedList){
+            if ( todo_to_check !== undefined){
+                if ( tailleCheckedList){
                     //Bd (table checkedList non vide)
                     let found = false;
                     console.log("Bd non vide")
                     //Nous allons effectuer une recherche pour savoir si l'utilisateur s'y trouve
                     for(let i = 0; i < tailleCheckedList ; i ++){
-                        if(checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
+                        if ( checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
                             checkedList[i].todos_checked.push(todo_to_check)
                             remove_command(userId,todolist,todoIndex)
 
@@ -254,7 +283,7 @@ try {
                             break;
                         }
                     }
-                    if(!found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
+                    if ( !found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
                     checkedList.push({chat_id:userId,todos_checked:[todo_to_check]})
                     remove_command(userId,todolist,todoIndex)
 
@@ -283,8 +312,8 @@ try {
     reset = function(userId,array){
         try{
 		for(let i = 0 ; i < array.length ; i++)
-			if(array[i].chat_id == userId)
-				if(array[i].todos)
+			if ( array[i].chat_id == userId)
+				if ( array[i].todos)
 					array[i].todos = new Array()
 				else if (array[i].todos_checked)
                     array[i].todos_checked = new Array()
@@ -293,7 +322,8 @@ try {
             sendMsg(userId,"Sorry an internal error occurs, we're  fixing it")
             sendMsg(440227163,"An error occurs : "+e)
         }
-	},sendMessage_with_inlineKey = function(userId,msg,inline){
+    },
+    sendMessage_with_inlineKey = function(userId,msg,inline){
         api.sendMessage({chat_id:userId,
             text:msg,
             reply_markup:JSON.stringify(inline),

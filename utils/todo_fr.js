@@ -43,7 +43,7 @@ try {
                         if(checkedList.length)
                             for (let j=0; j < checkedList.length; j++)
                                 if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                                    message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(checkedList[j])
+                                    message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg(checkedList[j])
                        
                     }
                     resolve(message)
@@ -92,13 +92,15 @@ try {
             todoIndex = parseInt(todoIndex)
             if(isNaN(todoIndex) ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
             if( todoIndex <= 0 ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
-
+            if(todoIndex > todolist.length) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
             else {
                 let tailleTodoList = todolist.length, user_lang = await fileUtils.getUserLang(userId, fileUtils.todo_file);
                 user_lang = user_lang.data;
                 todolist.splice(todoIndex-1,1)
                 console.log(todolist)
                 fileUtils.addUserTodo(userId, user_lang, todolist, fileUtils.todo_file)
+                todoUtils.sendMsg(userId,fr_FR.remove_command_text)  
+
             }
             console.log("remove_command invoked")
         } catch (e) {

@@ -1,7 +1,10 @@
-const todo_file = "/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
-    checked_file = __dirname + 'checked.json';
+
+const path = require('path');
+const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
+const checked_file = __dirname + 'checked.json';
 
 let fs = require("fs"), todoUtils = require("./todo");
+
 
 
 saveTodo =   function(todolist){
@@ -44,15 +47,17 @@ saveTodo =   function(todolist){
 }, getUserLang = async function(userId,todo_file){
   try {
     let datas = await read_file(todo_file),taille = datas.length;
-    // console.log(datas)
-    for(let i = 0; i< taille; i++)
-      if(datas[i].chat_id == userId)
-        return {error:false,data:datas[i].lang}
+    // console.log(datas[0].lang)
+    if (taille){ 
+       for(let i = 0; i< taille; i++)
+        if(datas[i].chat_id == userId)
+          return {error:false,data:datas[i].lang}
+    } else { return {error:false, data:"Nothing"} }
     //console.log(result)
   } catch (error) {
     return {error:true,error_msg:error}
   }
-    return {error:false, data:"Nothing"}
+  return {error:false, data:"Nothing"}
   
 }, getUserTodos = async function(userId,todo_file){
   try {
@@ -76,16 +81,17 @@ saveTodo =   function(todolist){
 },multi_add = function(userId,todos,user_lang){
 
   let nbLigne = todos.split('\n').length, user= {chat_id: userId,lang:user_lang,todos : []}
-  for(let i = 0; i <nbLigne; i++)
+  if(nbLigne > 1)
+    for(let i = 0; i <nbLigne; i++)
       user.todos.push(todos.split('\n')[i])
-
+  else user = {chat_id: userId, lang: user_lang, todos: [todos]}
   return user
 } ,addUserTodo = async function (userId,user_lang,todo,todo_file){
   try {
     // console.log("addUser debut")
     let todolist = await read_file(todo_file),taille_bd = todolist.length;
     let temp = multi_add(userId,todo,user_lang).todos
-    // console.log("todo = ",todo)
+    console.log("temp = ",temp)
     if(taille_bd){
       for(let user of todolist){
         if(user.chat_id == userId){
@@ -152,6 +158,22 @@ saveTodo =   function(todolist){
     console.error("addNewComer error : ",error)
     return
   }
+}, setUserLang = async function (userId, lang) {
+  try{  
+    let datas = await read_file(todo_file),taille = datas.length;
+    if (taille){ 
+      for(let i = 0; i< taille; i++)
+        if(datas[i].chat_id == userId){
+          datas[i].lang = lang;
+          saveTodo(datas);
+          console.log("setUserLang invoked")
+          break;
+        }
+    } else { return {error:false, data:"Nothing"} }
+  } catch (e) {
+    console.log("setUserLang error invoked")
+    console.error(e.message)
+  }
 }
 
 module.exports = {
@@ -162,5 +184,6 @@ read_file,
 todo_file,
 addUserTodo,
 addNewComer,
-fs
+fs,
+setUserLang
 }
