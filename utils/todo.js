@@ -15,9 +15,7 @@ try {
             enabled : true,
             get_interval : 1000
         }
-    });
-    api.on( 'RequestError' , ( err ) => console.log( "api error = ", err ) )
-
+    }),
     
     whichCommand = function ( message ) {
         let command = undefined, instruction = undefined, tmp = "";

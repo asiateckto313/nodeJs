@@ -2,7 +2,7 @@
 const path = require('path');
 const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
 
-let fs = require("fs"), todoUtils = require("./todo"),
+let fs = require("fs"),
 
 isFileExists = function (filePath) {
   try {
@@ -204,7 +204,7 @@ saveTodo =   function(todolist){
     console.log("setUserLang error invoked")
     console.error(e.message)
   }
-}
+};
 
 module.exports = {
 saveTodo,

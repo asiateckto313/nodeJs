@@ -1,10 +1,11 @@
 const path = require('path');
 const { initBd } = require('./utils/file');
+const { saveMessage } = require('./utils/messages');
 const todo_file = path.resolve('./todos.txt');
 const messages_file = path.resolve ( "./messages.txt" );
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
 
-
+// 1613681642 : 20h54 ; 1613681750; une différence de 100 porte à croire qu'une minute s'est écroulée
 let express = require('express'),
     fr_FR = require("./langs/fr_FR"),
     en_EN = require("./langs/en_EN"),
@@ -280,12 +281,15 @@ try{
     });
     
     api.on( 'message', function( message ) {
-        // A la réception d'un message
-        console.log (message)
+        // A la réception d'un message, on sauvegarde dans messages.txt afin de pouvoir effacer les messages de plus de 24h
+        saveMessage ( messages_file, message )
         let user_lang = undefined;
-        userId = message.chat.id, username = message.chat.username
+        userId = message.from.id, username = message.from.username, message_id = message.message_id,
+        message_date = message.date;
+
+
         
-        if (  username == undefined || username == "-" ) username = message.chat.first_name
+        if (  username == undefined || username == "-" ) username = message.from.first_name
 
         fileUtils.getUserLang( userId,fileUtils.todo_file ).then(async (result) => {
             //Récupération du langage défini par l'utilisateur
