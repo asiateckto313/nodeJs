@@ -204,16 +204,21 @@ try{
 
                 if ( result.data.command == 'set_bot_lang' ) {
                     set_lang_inline = true
-                    if ( !result.data.instruction)
-                        todoUtils_fr.sendMessage_with_inlineKey(userId,"*S  lectionner la langue*",langs_option)
+                    if ( ! result.data.instruction )
+                        todoUtils_fr.sendMessage_with_inlineKey( userId, "*Sélectionner la langue*" , langs_option )
                     else { 
-                        if ( result.data.instruction.trim().toLowerCase()=='english' ) {eng = true;french = false;set_lang_inline = false
-                            todoUtils.sendMsg(userId," ^|^e Language set to English")
-    
+                        if ( result.data.instruction.trim().toLowerCase()=='english' ) { 
+                            eng = true; 
+                            french = false;
+                            set_lang_inline = false
+                            todoUtils.sendMsg( userId ," ✅ Language set to English")
                         }
-                        if ( result.data.instruction.trim().toLowerCase() == 'french' ) {eng = false; french = true; set_lang_inline = false
-                            todoUtils.sendMsg(userId," ^|^e Langue choisie : Fran  ais")
-    
+
+                        if ( result.data.instruction.trim().toLowerCase() == 'french' ) { 
+                            eng = false; 
+                            french = true; 
+                            set_lang_inline = false
+                            todoUtils.sendMsg( userId ," ✅ Langue choisie : Français")
                         }
                     }
                

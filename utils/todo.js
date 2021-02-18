@@ -16,44 +16,49 @@ try {
     }),
 
     
-    whichCommand = function (message){
+    whichCommand = function ( message ) {
         let command = undefined, instruction = undefined, tmp = "";
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
             // console.log(instruction) // vérification préalable de l'existence d'une instruction
             for( let i = 1; i < instruction.length; i++ )
-                tmp += instruction[i] + " "
+                tmp += instruction[ i ] + " "
             tmp = tmp.trim();
+            
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command
-                return { error : false, "data":{ "command" : command } }
+                return { error : false , "data": { "command" : command } }
                 
             } else {
                 //Case of add , remove or check
                 // console.log("LA")
-                return {error : false, data:{"command":command,"instruction":tmp}}
+                return { error : false , data : { "command" : command , "instruction" : tmp } }
             }
                 
-        } catch (e) { // La commande a été envoyé par le biais des boutons
-            console.log("Dans le catch")
-            try{
+        } catch ( e ) { // La commande a été envoyé par le biais des boutons
+            console.log( "Dans le catch" )
+
+            try {
+
             if ( message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
-            if ( message.data.split(' ').length == 2){
+            
+            if ( message.data.split(' ').length == 2) {
                 command = message.data.split(' ')[0].trim().split('/')[1]
                 instruction = message.data.split(' ')[1]
                 
             }
-            return {error:false,"data":{"command":command,"instruction":instruction}}
-        }catch ( f ){
-            return {error : true, error_msg:f}
-        }            
+            return { error : false , "data" : { "command" : command , "instruction" : instruction } }
+
+        } catch ( f ) {
+                return { error : true, error_msg : f }
+            }            
         }
     },
     
-    welcome_command = function(userId,username = undefined){
-        sendMsg(userId, "Hello @"+ username+" and thank you for using my bot. Let me know if any problem occurs because it's my first bot. Hope you will enjoy.")
+    welcome_command = function( userId , username = undefined ) {
+        sendMsg( userId , "Hello @"+ username+" and thank you for using my bot. Let me know if any problem occurs because it's my first bot. Hope you will enjoy." )
     },
     
     help_command = function(chatId){
