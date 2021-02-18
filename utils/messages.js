@@ -1,21 +1,38 @@
+const { whichCommand, api } = require("./todo");
+
 let fileUtils = require("./file"),
 /*Message format 
 { userId : user_id, messages : [ { messageId : message_id, date: dateMessageWasSent } ] }
 */
 saveMessage = function ( message_file , message) { 
    // On ne stocke que les id des messages afin de protéger le contenu de ces messages
+   let result = whichCommand (message)
+   if ( result.error ) {
+       //Le message envoyé n'est pas une commande bot
+       //Alors on l'efface et ne le stocke pas
+       api.deleteMessage( {
+           chat_id : message.chat.id ,
+           message_id : message.message_id 
+       } , (err , result) => {
+           if ( err ) { 
+               console.log( "Error while deleting " , err )
+               return
+           }
+           console.log( result, " Message deleted ✅" )
+       })
+       return
+   }
     fileUtils.read_file( message_file )
     .then ( messagesParsed => {
         let messageObj  = { userId : message.from.id, messages : [ { message_id : message.message_id,
             date : message.date } ]
             }
-            console.log (messageObj)
 
         if (  messagesParsed.length ) {
             //Existence d'au moins un user dans le fichier messages.txt
             // recherche des messages de l'utilsateur userId
             let userIdMessages = messagesParsed.filter ( message => message.userId === messageObj.userId );
-            console.log ( "userIdMessages = ", userIdMessages )
+
             if ( ! userIdMessages.length ) {
                 // L'utilisateur n'a pas encore envoyé de message au bot
                 
@@ -23,18 +40,13 @@ saveMessage = function ( message_file , message) {
         
             } else {
                 //Sinon on l'ajoute
-                console.log("SINON")
                 userIdMessages[0].messages.push(  { message_id : message.message_id, date : message.date }  )
-
-                console.log( " messagesParsed after push : ", messagesParsed )
             }
 
            
         } else {
             //Le fichier messages.txt est vide, première insertion
-            console.log("Premiere insertion, message.txt")
             messagesParsed.push(messageObj)
-            console.log("messagesParsed = ", messagesParsed[0].messages[0])
         }
 
         // Sauvegarde dans le fichier message.txt

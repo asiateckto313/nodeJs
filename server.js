@@ -293,18 +293,25 @@ try{
 
         fileUtils.getUserLang( userId,fileUtils.todo_file ).then(async (result) => {
             //Récupération du langage défini par l'utilisateur
-            console.log (  "getUserLang result = ", result )
             if ( ! result.error ) {
+
                 user_lang = result.data
-                if ( user_lang == 'Nothing' || user_lang == "undefined" ) {// Nous avons affaire à un nouvel utilisateur
-                    fileUtils.addNewComer(userId,todo_file)
+
+                if ( user_lang == 'Nothing' || user_lang == "undefined" ) {
+                    // Nous avons affaire à un nouvel utilisateur
+                    
+                    fileUtils.addNewComer( userId , todo_file )
+
                     newcomer = true;
-                    todoUtils.sendMessage_with_inlineKey(userId,"*Please set the bot language*",langs_option)
-                
+
+                    todoUtils.sendMessage_with_inlineKey( userId , "*Please set the bot language*" , langs_option )          
+
                 } else  if ( user_lang == "french" || user_lang == 'english' ) {
                     //Ancien utilisateur car la langue est soit undefined soit english soit français
                     if ( message.entities ) {
+
                         //Verify if the user started the bot, if true then he has to set the bot language
+                        
                         if ( ! todoUtils.isTheRightSyntax( message ) ) {
                             ( user_lang == "undefined" ) ? user_lang = 'english' : user_lang = user_lang;
                 
