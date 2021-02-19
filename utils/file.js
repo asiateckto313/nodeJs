@@ -44,8 +44,9 @@ initBd = function ( todo_file, message_file ) {
   }
 
   console.log('InitBd invoked')
-} ,
-saveTodo =   function(todolist){
+},
+
+saveTodo =   function( todolist ) {
   try {
     fs.writeFile(todo_file, JSON.stringify(todolist), (err) => {
       if (err) console.log("We've got an error : ", err)
@@ -57,9 +58,13 @@ saveTodo =   function(todolist){
   }
   
   return;
-}, updateFile = function(){
+},
 
-}, read_file =  function(todo_file){
+updateFile = function(){
+
+},
+
+read_file =  function( todo_file ) {
   return new Promise((resolve,reject)=>{
     fs.readFile(todo_file,'utf8',(err, data)=>{
     if(err) reject(err)
@@ -74,22 +79,31 @@ saveTodo =   function(todolist){
     }
 })
   })
-}, getUserLang = async function(userId,todo_file){
+},
+
+/**
+ * returns the language of the user userId
+ * @param {number} userId telegram user id to find the language
+ * @param {string} todo_file todo file path
+ * @returns {object} {error : false/true, data: "Nothing" / user_lang}
+ */
+getUserLang = async function( userId,todo_file ){
   try {
-    let datas = await read_file(todo_file),taille = datas.length;
-    // console.log(datas[0].lang)
-    if (taille){ 
-       for(let i = 0; i< taille; i++)
-        if(datas[i].chat_id == userId)
-          return {error:false,data:datas[i].lang}
-    } else { return {error:false, data:"Nothing"} }
+    let datas = await read_file(todo_file),
+    
+    user = datas.filter( user => user.chat_id === userId ) ;
+    if ( user.length ) { 
+      return { error : false, data : user[ 0 ].lang }
+    } else { return { error : false ,  data : "Nothing" } }
     //console.log(result)
   } catch (error) {
-    return {error:true,error_msg:error}
+    console.log( "getUserLang error invoked : ", error )
+    return { error : true ,  data : "Nothing" }
   }
-  return {error:false, data:"Nothing"}
   
-}, getUserTodos = async function(userId,todo_file){
+},
+
+getUserTodos = async function(userId,todo_file){
   try {
     let todolist = await read_file(todo_file), todos = undefined,taille = todolist.length;
     if(taille){
@@ -108,7 +122,9 @@ saveTodo =   function(todolist){
     return {error:true,error_msg:err}
   }
   
-},multi_add = function(userId,todos,user_lang){
+},
+
+multi_add = function(userId,todos,user_lang){
 
   let nbLigne = todos.split('\n').length, user= {chat_id: userId,lang:user_lang,todos : []}
   if(nbLigne > 1)
@@ -116,34 +132,39 @@ saveTodo =   function(todolist){
       user.todos.push(todos.split('\n')[i])
   else user = {chat_id: userId, lang: user_lang, todos: [todos]}
   return user
-} ,addUserTodo = async function (userId,user_lang,todo,todo_file){
+},
+
+addUserTodo = async function ( userId, user_lang, todo, todo_file) {
   try {
     // console.log("addUser debut")
-    let todolist = await read_file(todo_file),taille_bd = todolist.length;
-    let temp = multi_add(userId,todo,user_lang).todos
-    console.log("temp = ",temp)
-    if(taille_bd){
-      for(let user of todolist){
-        if(user.chat_id == userId){
-          if (Array.isArray(todo)) {console.log("array");user.todos = todo; saveTodo(todolist); return}
-          user.todos = user.todos.concat(temp)
+    let todolist = await read_file( todo_file ), taille_bd = todolist.length;
+    let temp = multi_add( userId,todo, user_lang ).todos
+    console.log( "temp = ",temp )
+    if( taille_bd ) {
+      for( let user of todolist ) {
+        if( user.chat_id == userId ) {
+          if ( Array.isArray( todo ) ) {
+            user.todos = todo; 
+            saveTodo( todolist ); 
+            return
+          }
+          user.todos = user.todos.concat( temp )
           //user.todos.push(todo)
-          saveTodo(todolist)
+          saveTodo( todolist )
           console.log("addUserTodo invoked, user found in db")
           return
         }
       }
-      todolist.push(multi_add(userId,todo,user_lang))
+      todolist.push( multi_add( userId, todo, user_lang ) )
       // todolist.push({chat_id:userId,lang:user_lang,todos:[todo]})
-      saveTodo(todolist)
-      console.log("todolist2 = ",todolist)
+      saveTodo( todolist )
       console.log("addUserTodo invoked, user was not found new adding ")
       return
     }else{
-      todolist.push( multi_add(userId,todo,user_lang) )
+      todolist.push( multi_add( userId, todo, user_lang ) )
       // todolist.push({chat_id:userId,lang:user_lang,todos:[todo]})
       console.log("addUserTodo invoked, empty db first adding")
-      saveTodo(todolist)
+      saveTodo( todolist )
       return 
 
     }
@@ -154,17 +175,17 @@ saveTodo =   function(todolist){
     let todolist = await read_file(todo_file),taille_bd = todolist.length;
     console.error('addUser error = ', error.message)
     if(taille_bd){
-      for(let user of todolist){
-        if(user.chat_id == userId){
-          if (Array.isArray(todo)) {user.todos = todo; saveTodo(todolist); return}
-          user.todos = user.todos.concat(temp)
+      for( let user of todolist ) {
+        if( user.chat_id == userId ) {
+          if ( Array.isArray( todo ) ) { user.todos = todo; saveTodo( todolist ); return }
+          user.todos = user.todos.concat( temp )
           //user.todos.push(todo)
-          saveTodo(todolist)
-          console.log("addUserTodo invoked, user found in db")
+          saveTodo( todolist )
+          console.log( "addUserTodo invoked, user found in db" )
           return
         }
       }
-      console.log("Updated invoked, user was not found new adding ")
+      console.log( "Updated invoked, user was not found new adding " )
       return
     }else{
       todolist.push( multi_add(userId,todo,user_lang) )

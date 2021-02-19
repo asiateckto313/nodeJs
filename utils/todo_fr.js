@@ -22,28 +22,28 @@ try {
        
     },
     
-    add_command = function(todolist,userId,todo,user_lang){
-        todoUtils.add_command(todolist,userId,todo,user_lang);
+    add_command = function( todolist, userId, todo, user_lang ) {
+        todoUtils.add_command( todolist, userId, todo, user_lang);
     }, 
     
     
     get_command = function(todolist,checkedList,userId){
         let message = "";
-        return new Promise((resolve, reject) => {
-            fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
+        return new Promise( ( resolve, reject ) => {
+            fileUtils.getUserTodos( userId, fileUtils.todo_file ).then( res =>{
                 // console.log("res = ",res)
-                if(!res.error){
+                if( !res.error ) {
                     let todos = res.todos, taille = todos.length;
                     // console.log("todos = ", todos )
-                    if(taille){
-                        message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(res)
-                        console.log(message)
+                    if( taille ) {
+                        message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg( res )
+                        console.log( message )
 
                         
-                        if(checkedList.length)
-                            for (let j=0; j < checkedList.length; j++)
-                                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                                    message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg(checkedList[j])
+                        if( checkedList.length )
+                            for ( let j=0; j < checkedList.length; j++ )
+                                if( userId == checkedList[ j ].chat_id && checkedList[ j ].todos_checked.length > 0 )
+                                    message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg( checkedList[ j ] )
                        
                     }
                     resolve(message)
@@ -54,52 +54,22 @@ try {
         console.log("todo_fr.get_command invoked")
         
         })
-        console.log(todolist.length)
-    
-        if(todolist.length ){
-           
-            for (let j=0; j < todolist.length; j++){
-                //Si jamais l'utilisateur userId a des todos alors on formalise le msg
-                if(userId == todolist[j].chat_id && todolist[j].todos.length > 0)
-                    message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(todolist[j])
-                
-                    
-
-            }
-            if(checkedList.length)
-            for (let j=0; j < checkedList.length; j++)
-                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                    message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg(checkedList[j])
-            
-        
-        }else{
-            if(!checkedList.length)
-                message = fr_FR.check_empty_text
-            else{
-                for (let j=0; j < checkedList.length; j++){
-                    if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                        message += fr_FR.serialize_msg_checklist_text + serialize_msg(checkedList[j])
-            }
-        }
-        
-        
-    }
-    console.log("todo_fr.get_command invoked")
-    return message
     },
-    remove_command = async  function(userId,todolist, todoIndex){
-       try {  
-            todoIndex = parseInt(todoIndex)
-            if(isNaN(todoIndex) ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
-            if( todoIndex <= 0 ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
-            if(todoIndex > todolist.length) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
+
+    remove_command = async  function( userId, todolist, todoIndex ) {
+       try {
+           console.log("remove command")
+            todoIndex = parseInt( todoIndex )
+            if( isNaN( todoIndex ) ) todoUtils.sendMsg( userId, fr_FR.invalid_index_text )
+            if( todoIndex <= 0 ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text ) 
+            if( todoIndex > todolist.length ) todoUtils.sendMsg( userId, fr_FR.invalid_index_text )
             else {
                 let tailleTodoList = todolist.length, user_lang = await fileUtils.getUserLang(userId, fileUtils.todo_file);
                 user_lang = user_lang.data;
-                todolist.splice(todoIndex-1,1)
-                console.log(todolist)
-                fileUtils.addUserTodo(userId, user_lang, todolist, fileUtils.todo_file)
-                todoUtils.sendMsg(userId,fr_FR.remove_command_text)  
+                todolist.splice( todoIndex-1, 1 )
+                console.log( todolist )
+                fileUtils.addUserTodo( userId, user_lang, todolist, fileUtils.todo_file )
+                todoUtils.sendMsg( userId , fr_FR.remove_command_text )  
 
             }
             console.log("remove_command invoked")
@@ -195,10 +165,13 @@ try {
         return;
      
     },
+
     reset = function(userId,array){
         todoUtils.reset(userId,array)
         
-	},sendMessage_with_inlineKey = function(userId,msg,inline){
+    },
+    
+    sendMessage_with_inlineKey = function(userId,msg,inline){
         todoUtils.sendMessage_with_inlineKey(userId,msg,inline)
     };
     

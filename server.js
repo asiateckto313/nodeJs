@@ -5,7 +5,7 @@ const todo_file = path.resolve('./todos.txt');
 const messages_file = path.resolve ( "./messages.txt" );
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
 
-// 1613681642 : 20h54 ; 1613681750; une différence de 100 porte à croire qu'une minute s'est écroulée
+// 1613681642 : 20h54 ; 1613681750; une différence de 60 porte à croire qu'une minute s'est écroulée
 let express = require('express'),
     fr_FR = require("./langs/fr_FR"),
     en_EN = require("./langs/en_EN"),
@@ -17,59 +17,7 @@ let express = require('express'),
     api = todoUtils.api, 
     todolist = new Array(), checkList = new Array(),userId="";
 
-let  inlineKeyboard = {
-    inline_keyboard: [
-        [
-            {
-                text: 'Help',
-                callback_data: '/help'
-            }
-            
-        ],
-        [
-            {
-                text: 'Add',
-                callback_data: '/add'
-            },
-            {
-                text: 'Get',
-                callback_data: '/get'
-            }
-            
-        ],
-        [
-            {
-                text: 'Check',
-                callback_data: '/check'
-            },{
-                text: 'Remove',
-                callback_data: '/remove'
-            }
-        ],[
-            {
-                text: 'Reset',
-                callback_data: '/reset'
-            }
-        ],[
-            {
-                text: 'Set bot language',
-                callback_data: '/set_bot_lang'
-            }
-        ]
-    ]
-}, reset_option = {
-    inline_keyboard:[
-        [{
-            text:"My to do list",
-            callback_data: '/reset todolist'
-        }],[
-            {
-                text:"My checked list",
-                callback_data: '/reset checklist'
-            }
-        ]
-    ]
-}, langs_option = {
+let  langs_option = {
     inline_keyboard:[
         [{
             text:"English / Anglais",
@@ -83,7 +31,7 @@ let  inlineKeyboard = {
     ]
 },add_inline = false, check_inline = false, remove_inline = false, set_lang_inline = false,username = undefined;
 
-initBd(todo_file, messages_file)
+initBd( todo_file, messages_file ) // Initiailisation de la bd
 
 try{
 
@@ -95,7 +43,7 @@ try{
     //todolist constitue ici la bd avec un utilisateur (userId) qui peut avoir un ou plusieurs todos
     api.on( 'inline.callback.query', async function( message ) {
         // Il s'agit ici des actions menées lors du clic sur les boutons envoyés par le bot
-        console.log ( 'inline ',message)
+        // console.log ( 'inline ',message)
         //Vérification de la commande envoyée par l'utilisateur et récupération du message ainsi que de son username
         let result = todoUtils.whichCommand(message), userId = message.from.id, username  = message.message.chat.username;
         
@@ -107,26 +55,27 @@ try{
         let user_lang = await fileUtils.getUserLang(userId, fileUtils.todo_file);
         console.log ( user_lang.data, user_lang)
         if ( !user_lang.error && ( user_lang.data !== "Nothing" && user_lang.data !== "undefined" )  ) {
-            console.log ( user_lang.data)
+            console.log ( user_lang.data )
             if ( user_lang.data.toLowerCase() === "english") {
+
                 //SI sa préférence linguistique est l'anglais, alors on lui répond en anglais
                 if ( result.data.command == 'get' ) {
-                    todoUtils.get_command(todolist,checkList,userId).then(msg => {
-                        console.log ( "msg = ",msg)
-                        if ( msg !== "")
-                            todoUtils.sendMsg(userId,msg)
+                    todoUtils.get_command( todolist, checkList, userId ).then( msg => {
+                        console.log ( "msg = ", msg )
+                        if ( msg !== "" )
+                            todoUtils.sendMsg( userId, msg )
                         else
-                            todoUtils.sendMsg(userId,en_EN.check_empty_text)
+                            todoUtils.sendMsg( userId, en_EN.check_empty_text )
                     })
                     
                 }
 
                 if ( result.data.command == 'help')
-                todoUtils.help_command(userId)
+                    todoUtils.help_command(userId)
 
                 if ( result.data.command == 'reset' ) {
                     if ( result.data.instruction == undefined)
-                    todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",reset_option)
+                    todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",todoUtils.reset_option)
     
                     if ( result.data.instruction == 'todolist' ) {
                         todoUtils.reset(userId,todolist)
@@ -150,11 +99,11 @@ try{
 
                 if ( result.data.command == 'add' ) {
                     add_inline = true
-                    todoUtils.sendMsg(userId,"Send now the todo to add")
+                    todoUtils.sendMsg( userId, "Send now the todo to add" )
                 }
                 if ( result.data.command == 'remove' ) {
                     remove_inline = true
-                    todoUtils.sendMsg(userId,"Send now the index of the to remove")
+                    todoUtils.sendMsg( userId, "Send now the index of the to remove" )
         
                 }
                 if (  result.data.command == 'check' ) {
@@ -163,7 +112,10 @@ try{
         
                 }
     
-            } else if (user_lang.data.toLowerCase() === "french" ) {
+            
+            } 
+            
+            else if ( user_lang.data.toLowerCase() === "french" ) {
                 if ( result.data.command == 'get' ) {
                     todoUtils_fr.get_command(todolist,checkList,userId).then(msg => {
                         console.log ( "msg = ",msg)
@@ -234,50 +186,10 @@ try{
 
         } else {
             // S'il n'a pas de préférence on lui en met une par défaut
-            console.log ( result.data.instruction)
-            fileUtils.setUserLang(userId,result.data.instruction);
+            console.log ( result.data.instruction )
+            fileUtils.setUserLang( userId, result.data.instruction );
         }
 
-
-       /* if ( result.data.command == 'set_bot_lang' ) {
-            set_lang_inline = true
-            if ( !result.data.instruction)
-                todoUtils_fr.sendMessage_with_inlineKey(userId,"*Choose the language*",langs_option)
-            else { 
-                if ( result.data.instruction.trim().toLowerCase()=='english' ) {
-                    todoUtils.change_language_preference(userId,'english',todo_file)
-                    set_lang_inline = false
-                    todoUtils.sendMsg(userId,"✅ Language set to English")
-                    console.log ( "newcomer english : ",newcomer)
-
-                    if ( newcomer) todoUtils.welcome_command(userId,username) 
-                    else console.log ( newcomer = newcomer);
-                    newcomer = false;
-
-                }
-                if ( result.data.instruction.trim().toLowerCase() == 'french' ) {
-                    todoUtils.change_language_preference(userId,'french',todo_file)
-                    set_lang_inline = false
-                    todoUtils.sendMsg(userId,"✅ Langue choisie : Français")
-                    console.log ( "newcomer french : ",newcomer)
-                    if ( newcomer)  todoUtils_fr.welcome_command(userId,username)
-                    else newcomer = newcomer;
-                    newcomer = false
-                }
-            }
-        }
-
-        if ( result.data.command === "reset") {
-            if (!result.data.instruction) {// on a rçu de /commands
-            }
-            if ( result.data.instruction === "checklist") {}
-
-
-        }
-
-        if ( result.data.command == "help" ) {
-            (user_lang == "english") ? todoUtils.help_command(userId) : todoUtils_fr.help_command(userId)
-        }*/
     });
     
     api.on( 'message', function( message ) {
@@ -286,7 +198,6 @@ try{
         let user_lang = undefined;
         userId = message.from.id, username = message.from.username, message_id = message.message_id,
         message_date = message.date;
-
 
         
         if (  username == undefined || username == "-" ) username = message.from.first_name
@@ -311,16 +222,16 @@ try{
                     if ( message.entities ) {
 
                         //Verify if the user started the bot, if true then he has to set the bot language
-                        
+
                         if ( ! todoUtils.isTheRightSyntax( message ) ) {
                             ( user_lang == "undefined" ) ? user_lang = 'english' : user_lang = user_lang;
                 
-                            ( user_lang == 'english' ) ? todoUtils.sendMsg( userId, en_EN.wrong_syntax ) : todoUtils.sendMsg(userId,fr_FR.wrong_syntax)
+                            ( user_lang == 'english' ) ? todoUtils.sendMsg( userId, en_EN.wrong_syntax ) : todoUtils.sendMsg( userId, fr_FR.wrong_syntax )
         
                         }
                         else { 
                             //The right syntax
-                            let result = todoUtils.whichCommand(message), command = result.data.command,instruction = result.data.instruction
+                            let result = todoUtils.whichCommand( message ), command = result.data.command,instruction = result.data.instruction
                             if ( user_lang == "french" ) {
                                 //buttons
                                 if ( add_inline ) {
@@ -353,11 +264,7 @@ try{
 
                                         }
                                             
-                                            // todoUtils_fr.add_command(todolist,userId,instruction,user_lang)
-                                            // fileUtils.saveTodo(todolist)
-
-                                            // todoUtils.sendMsg(userId,fr_FR.todo_added_text)
-                                        
+                                           
                                         if ( command === "reset") { console.log ( "reset") }
 
                                         if ( command == "remove")
@@ -370,7 +277,7 @@ try{
                                         if ( command == 'reset' ) {
                                             //TODO reset
                                             todoUtils.sendMsg(userId,"Nous sommes en train d'implémenter cette syntaxe")
-                                            todoUtils_fr.sendMessage_with_inlineKey(userId, "*Quelle liste souhaitez-vous réinitialiser ?*",reset_option)
+                                            todoUtils_fr.sendMessage_with_inlineKey(userId, "*Quelle liste souhaitez-vous réinitialiser ?*", todoUtils_fr.reset_option_FR )
                                         }
                                         if ( command == 'commands')
                                             todoUtils_fr.sendMessage_with_inlineKey(userId,fr_FR.commands_button_text,todoUtils_fr.inlineKeyboard_fr)
@@ -397,9 +304,9 @@ try{
                             } else  if (user_lang == "english" ) {
                                 //buttons
                                 if ( add_inline ) {
-                                    
-                                    todoUtils.add_command(todolist,userId,message.text.trim(),user_lang)
-                                    todoUtils.sendMsg(userId,"Todo added 👍")
+                                    console.log("ICI")
+                                    todoUtils.add_command( todolist, userId, message.text.trim(), user_lang )
+                                    todoUtils.sendMsg( userId, en_EN.todo_added_text )
                                     add_inline = false
                                     
                                 } else  if ( remove_inline ) { 
@@ -413,11 +320,53 @@ try{
                                     check_inline = false
                                 } else  { 
                                     //syntaxes brutes
-                                    if ( command == 'help')
-                                        todoUtils.help_command(userId)
-                                    if ( command == 'commands')
-                                        todoUtils.sendMessage_with_inlineKey(userId,"*What do you want to do ?*",inlineKeyboard)
+                                    if ( instruction ) {
+                                        todolist = await fileUtils.getUserTodos( userId, fileUtils.todo_file )
+                                        todolist = todolist.todos
 
+                                        if ( command == 'add' ) {
+                                    
+                                            todoUtils.add_command( todolist, userId, instruction, user_lang)
+                                            //fileUtils.saveTodo(todolist)
+                                            todoUtils.sendMsg(userId,en_EN.todo_added_text)
+
+                                        }
+                                            
+                                        if ( command === "reset") { console.log ( "reset") }
+
+                                        if ( command == "remove")
+                                            todoUtils.remove_command( userId , todolist, instruction ) // Update the todolist array by removing one item
+
+                                        if ( command == "check")
+                                            todoUtils.check_command( instruction , todolist , checkList , userId )
+
+                                    }
+                                    else  {  // Sans instruction il s'agit des syntaxes get, commands et help
+
+                                        if ( command == 'reset' ) {
+                                            //TODO reset
+                                            todoUtils.sendMsg( userId, "We are working on this feature" )
+                                            todoUtils.sendMessage_with_inlineKey( userId, "*What list do you want to reset ?*", todoUtils.reset_option )
+                                        }
+
+                                        if ( command == 'commands')
+                                            todoUtils.sendMessage_with_inlineKey( userId, en_EN.commands_button_text, todoUtils.inlineKeyboard )
+
+                                        if ( command == "help")
+                                            todoUtils.help_command( userId )
+                                
+                                        if ( command == 'get' ) {
+                                            todoUtils.get_command( todolist, checkList, userId ).then( msg => {
+                                                console.log ( "msg = ",msg )
+                                                if ( msg !== "" )
+                                                    todoUtils.sendMsg( userId, msg )
+                                                else
+                                                    todoUtils.sendMsg( userId, en_EN.check_empty_text ) 
+                                            })
+                                            
+                                        }
+                                    }
+                                    
                                 }
                             }
                         }
@@ -430,19 +379,22 @@ try{
                         if ( set_lang_inline ) {
                             console.log ( "Dans le set_lang_inline")
                             console.log ( message)
-                             if ( message.text.trim().toLowerCase()=='english' ) {fileUtils.setUserLang(userId,'english')}
-                             if ( message.text.trim().toLowerCase() == 'french' ) {fileUtils.setUserLang(userId, 'french')}
+                             if ( message.text.trim().toLowerCase()=='english' ) { fileUtils.setUserLang( userId , 'english' ) }
+                             if ( message.text.trim().toLowerCase() == 'french' ) { fileUtils.setUserLang( userId, 'french' ) }
                         }
                  
                         if ( add_inline ) {
                                     
-                            todoUtils_fr.add_command(todolist,userId,message.text.trim(),user_lang)
+                            todoUtils_fr.add_command( todolist , userId , message.text.trim() , user_lang )
                             // fileUtils.saveTodo(todolist)
-                            todoUtils.sendMsg(userId,fr_FR.todo_added_text)
+                            if ( user_lang === 'english' ) 
+                             todoUtils.sendMsg( userId, en_EN.todo_added_text ) 
+                            else
+                             todoUtils.sendMsg( userId, fr_FR.todo_added_text )
                             add_inline = false
                             
                         } else  if ( remove_inline ) { 
-                            todoUtils_fr.remove_command(userId,todolist,parseInt(message.text.trim()))
+                            todoUtils_fr.remove_command( userId, todolist, parseInt( message.text.trim() ) )
                             remove_inline = false
                             
                         } else  if ( check_inline ) {
@@ -471,6 +423,10 @@ try{
     api.on( 'edited.message', ( message ) => {
     console.log ( 'message edited = ',message)
 })
+    
+    api.on('error', ( err ) => {
+        console.log( "Error : ", err )
+    } )
 
 } catch( err ) {
     console.log ( "DANS LE CATCH")

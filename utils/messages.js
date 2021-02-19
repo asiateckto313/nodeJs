@@ -6,8 +6,8 @@ let fileUtils = require("./file"),
 */
 saveMessage = function ( message_file , message) { 
    // On ne stocke que les id des messages afin de protéger le contenu de ces messages
-   let result = whichCommand (message)
-   if ( result.error ) {
+   let result = whichCommand ( message )
+   /* if ( result.error ) {
        //Le message envoyé n'est pas une commande bot
        //Alors on l'efface et ne le stocke pas
        api.deleteMessage( {
@@ -21,7 +21,7 @@ saveMessage = function ( message_file , message) {
            console.log( result, " Message deleted ✅" )
        })
        return
-   }
+   } */
     fileUtils.read_file( message_file )
     .then ( messagesParsed => {
         let messageObj  = { userId : message.from.id, messages : [ { message_id : message.message_id,
