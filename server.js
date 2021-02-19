@@ -1,6 +1,7 @@
 const path = require('path');
 const { initBd } = require('./utils/file');
 const { saveMessage } = require('./utils/messages');
+const { sendMsg } = require('./utils/todo');
 const todo_file = path.resolve('./todos.txt');
 const messages_file = path.resolve ( "./messages.txt" );
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
@@ -31,9 +32,10 @@ let  langs_option = {
     ]
 },add_inline = false, check_inline = false, remove_inline = false, set_lang_inline = false,username = undefined;
 
-initBd( todo_file, messages_file ) // Initiailisation de la bd
 
 try{
+    initBd( todo_file, messages_file ) // Initiailisation de la bd
+
 
     api.on( 'inline.result', function( message )
     {
@@ -363,6 +365,10 @@ try{
                                                 else
                                                     todoUtils.sendMsg( userId, en_EN.check_empty_text ) 
                                             })
+                                            .catch ( err => {
+                                                sendMsg(userId, "We are facing to trouble, we are fixing it")
+                                                console.log ( "get error = ", err)
+                                            } )
                                             
                                         }
                                     }
@@ -388,13 +394,13 @@ try{
                             todoUtils_fr.add_command( todolist , userId , message.text.trim() , user_lang )
                             // fileUtils.saveTodo(todolist)
                             if ( user_lang === 'english' ) 
-                             todoUtils.sendMsg( userId, en_EN.todo_added_text ) 
+                             todoUtils.sendMsg( userId,en_EN.todo_added_text ) 
                             else
-                             todoUtils.sendMsg( userId, fr_FR.todo_added_text )
+                             todoUtils.sendMsg(userId,fr_FR.todo_added_text)
                             add_inline = false
                             
                         } else  if ( remove_inline ) { 
-                            todoUtils_fr.remove_command( userId, todolist, parseInt( message.text.trim() ) )
+                            todoUtils_fr.remove_command(userId,todolist,parseInt(message.text.trim()))
                             remove_inline = false
                             
                         } else  if ( check_inline ) {

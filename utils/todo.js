@@ -3,7 +3,7 @@
 const path = require('path');
 const { token } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
-const { addUserTodo, getUserLang } = require('./file');
+const { addUserTodo, getUserLang  } = require('./file');
 
 const todo_file = path.resolve('./todos.txt');
 let  inlineKeyboard = {
@@ -197,6 +197,7 @@ try {
                     resolve(msg)
                 }
             }).catch( e => {
+                console.log (" get_command error : ", e)
                 reject( e )
             })
         console.log("get_command invoked")
@@ -222,7 +223,7 @@ try {
 
                     addUserTodo( userId, user_lang.data , todolist, todo_file)
                     .then ( response => {
-                        console.log ( "response = ", response )
+                        sendMsg(userId,"Todo removed 👍")  
                     } )
                     .catch ( err => {
                         console.log ( "err = ", err)
@@ -232,9 +233,7 @@ try {
                     console.log ( "err2 = ", err2 )
                 } )
 
-                /* addUserTodo( userId, user_lang.data , todolist)
-                sendMsg(userId,"Todo removed 👍")  
-                 */
+                
             }
                     
         }else{
@@ -262,7 +261,7 @@ try {
     
     sendMsg = function(chatId, text,mode=undefined ) {
         //console.log("mode = ",mode)
-        if ( mode)
+        if ( mode )
             api.sendMessage({
                 chat_id:chatId,
                 text: text,
@@ -298,31 +297,26 @@ try {
         
     },
     
-    check_command = function( todoIndex, todolist, checkedList, userId ) {
+    /* check_command = function( todoIndex, todolist, checkedList, userId ) {
         console.log("userid = ",userId)
-        let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
+        console.log ("check command todolist = ", todolist)
+        let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length;
 
        if ( verifyIndex(todoIndex,todolist,userId) ) {
            //L'index entré est validé nous allons d'abord récupérer le todo
-           let todo_to_check = undefined
+           let todo_to_check = todolist[todoIndex - 1]
            
-            for(let i = 0; i < tailleTodoList ; i ++ ) {
-                if ( todolist[i].chat_id == userId ) {//On se trouve sur la ligne de l'utilisateur
-                    todo_to_check = todolist[i].todos[todoIndex-1]
-                    break;
-                }
-            }
             if ( todo_to_check !== undefined ) {
+
                 if ( tailleCheckedList ) {
                     //Bd (table checkedList non vide)
                     let found = false;
                     console.log("Bd non vide")
                     //Nous allons effectuer une recherche pour savoir si l'utilisateur s'y trouve
-                    for(let i = 0; i < tailleCheckedList ; i ++ ) {
-                        if ( checkedList[i].chat_id == userId ) {//On se trouve sur la ligne de l'utilisateur
-                            checkedList[i].todos_checked.push(todo_to_check)
-                            remove_command(userId,todolist,todoIndex)
-
+                    for( let i = 0; i < tailleCheckedList ; i ++ ) {
+                        if ( checkedList[ i ].chat_id === userId ) {//On se trouve sur la ligne de l'utilisateur
+                            checkedList[ i ].todos_checked.push(todo_to_check)
+                            remove_command( userId , todolist , todoIndex )
                             found = true
                             break;
                         }
@@ -333,26 +327,39 @@ try {
 
                 }
                 }else{
-                    checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
-                    remove_command(userId,todolist,todoIndex)
+                    checkedList.push( { chat_id : userId, todos_checked : [ todo_to_check ] } )
+                    remove_command( userId , todolist , todoIndex )
 
                     console.log("Bd vide, premier ajout")
                 }
             }
             
             console.log("checkedList : ",checkedList)
-            sendMsg(userId, "Added to the checked list. We are removing your todo")
+            let userCheckList = checkedList.filter(checks => checks.chat_id === userId) [0].todos_checked;
+            addUserTodoCheck( userId, userCheckList , todo_file )
+            /* fileUtils.read_file(todo_file)
+            .then ( contents => {
+                let user = contents.filter ( users => users.chat_id === userId ),
+                userChecklist = checkedList.filter ( users => users.chat_id === userId );
+                if ( user[0].todos_checked && user[0].todos_checked.length ) {
+                    // L'utilisateur a au moins un todo checked
+                    console.log( "user has at least one todo checked")
+                    user.todos_checked.concat(userChecklist[ 0 ].todos_checked)
+                } else {
+                    // L'utilisateur n'a aucun todos_checked
+                    console.log ( "first todo to check" )
+                    user[ 0 ].todos_checked =  userChecklist[ 0 ].todos_checked
+                    console.log (todolist)
+                    addUserTodo
+                    // saveTodo()
+                }
+            } )
+            sendMsg(userId, "Added to the checked list. We are removing your todo") 
             return;
-                
-                    
-        }
-       else
+        } else
             sendMsg(userId,"Invalid Index")
-        return;
-
-
-     
-    },
+        return;     
+    }, */
 
     reset = function(userId,array ) {
         try{
@@ -388,7 +395,7 @@ try {
         serialize_msg,
         isTheRightSyntax,
         welcome_command,
-        check_command,
+        //check_command,
         verifyIndex,
         reset,
         help_command,

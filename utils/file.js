@@ -1,5 +1,6 @@
 
 const path = require('path');
+const { sendMsg } = require('./todo');
 const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
 
 let fs = require("fs"),
@@ -13,7 +14,7 @@ isFileExists = function (filePath) {
   } catch(err) {
     return false
   }
-} ,
+},
 
 initBd = function ( todo_file, message_file ) { 
   if (!todo_file || !message_file) {
@@ -87,7 +88,7 @@ read_file =  function( todo_file ) {
  * @param {string} todo_file todo file path
  * @returns {object} {error : false/true, data: "Nothing" / user_lang}
  */
-getUserLang = async function( userId,todo_file ){
+getUserLang = async function( userId,todo_file ) {
   try {
     let datas = await read_file(todo_file),
     
@@ -197,7 +198,52 @@ addUserTodo = async function ( userId, user_lang, todo, todo_file) {
     }
   }
   
-}, addNewComer = async function(userId,todo_file){
+},
+
+addUserTodoCheck = async function ( userId, todoCheck, todo_file) {
+  try {
+    let todolist = await read_file( todo_file ), taille_bd = todolist.length;
+    if( taille_bd ) {
+      for( let user of todolist ) {
+        if( user.chat_id == userId ) {
+          if ( Array.isArray( todoCheck ) ) {
+            user.todos_checked = todoCheck; 
+            console.log ( "user.todos_checked = ", user.todos_checked )
+            //saveTodo( todolist ); 
+            return
+          }
+          if ( user.todos_checked && user.todos_checked.length ) {
+            // L'utilisateur a au moins un todo checked
+            console.log( "user has at least one todo checked")
+            user.todos_checked.concat(todoCheck)
+            console.log (" user.todos_checked.concat =  ", user.todos_checked)
+        } else {
+            // L'utilisateur n'a aucun todos_checked
+            console.log ( "first todo to check" )
+            user.todos_checked = todoCheck;
+            console.log ("first todo  user.todos_checked =  ", user.todos_checked)
+ 
+        }
+          //saveTodo( todolist )
+          console.log("addUserTodo invoked, user found in db")
+          return
+        }
+      }
+      
+    } else {
+      sendMsg( userId , "Add firstly a to do before wanting to check it" )
+      return 
+
+    }  
+
+  } catch (error) {
+    sendMsg(userId, "We are facing to some troubles with this feature, we are on it")
+    console.log ( "addUserTodoCheck error = ", error )
+  }
+  
+},
+
+addNewComer = async function(userId,todo_file){
   try {
     let todolist = await read_file(todo_file);
     console.log("todolist = ",todolist)
@@ -209,7 +255,9 @@ addUserTodo = async function ( userId, user_lang, todo, todo_file) {
     console.error("addNewComer error : ",error)
     return
   }
-}, setUserLang = async function (userId, lang) {
+}, 
+
+setUserLang = async function (userId, lang) {
   try{  
     let datas = await read_file(todo_file),taille = datas.length;
     if (taille){ 
@@ -225,7 +273,8 @@ addUserTodo = async function ( userId, user_lang, todo, todo_file) {
     console.log("setUserLang error invoked")
     console.error(e.message)
   }
-};
+}
+;
 
 module.exports = {
 saveTodo,
@@ -238,5 +287,6 @@ addNewComer,
 isFileExists,
 fs,
 setUserLang,
-initBd
+initBd,
+addUserTodoCheck
 }
