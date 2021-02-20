@@ -78,12 +78,10 @@ try{
                     todoUtils.sendMessage_with_inlineKey(userId,"*Choose a list to reset*",reset_option)
     
                     if ( result.data.instruction == 'todolist' ) {
-                        todoUtils.reset(userId,todolist)
-                        todoUtils.sendMsg(userId,'List has been reset')
+                        todoUtils.reset(userId,true)
                     }
                     if ( result.data.instruction == 'checklist' ) {
-                        todoUtils.reset(userId,checkList)
-                        todoUtils.sendMsg(userId,'List has been reset')
+                        todoUtils.reset(userId,false)
                     }
     
                 }
@@ -392,7 +390,7 @@ try{
 
                                         if ( command == 'reset' ) {
                                             //TODO reset
-                                            todoUtils.sendMsg( userId, "We are working on this feature" )
+                                            // todoUtils.sendMsg( userId, "We are working on this feature" )
                                             todoUtils.sendMessage_with_inlineKey( userId, "*What list do you want to reset ?*", todoUtils.reset_option )
                                         }
                                     }
@@ -453,7 +451,7 @@ try{
     api.on( 'edited.message', ( message ) => {
     console.log ( 'message edited = ',message)
 })
-
+exports.TODO_FILE = todo_file
 } catch( err ) {
     console.log ( "DANS LE CATCH")
     console.log ( "error : ",err)

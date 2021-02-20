@@ -1,9 +1,11 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
+const { response } = require('express');
 const path = require('path');
 const { token } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
-const { getUserLang, addUserTodo } = require('./file');
+const { TODO_FILE } = require('../server');
+const { getUserLang, addUserTodo, getUserTodos, read_file, saveTodo } = require('./file');
 
 const todo_file = path.resolve('./todos.txt');
 
@@ -343,14 +345,26 @@ try {
 
      
     },
-    reset = function(userId,array){
+    reset = function(userId,todolist_or_checkList){
+        // L'on va procéder par un bool pour savoir si l'on souhaite réinitialiser la todo list ou la checkedList
         try{
-		for(let i = 0 ; i < array.length ; i++)
-			if ( array[i].chat_id == userId)
-				if ( array[i].todos)
-					array[i].todos = new Array()
-				else if (array[i].todos_checked)
-                    array[i].todos_checked = new Array()
+           if (typeof todolist_or_checkList === "boolean") {
+            read_file( todo_file )
+            .then ( bdContent => {
+                
+                // User wants to reset his todo list
+                let userTodo = bdContent.filter (user => user.chat_id === userId)
+                todolist_or_checkList ? userTodo[0].todos = [] : userTodo[0].todos_checked = []
+                saveTodo(bdContent)
+                todolist_or_checkList ? sendMsg( userId,'✅ Your todo list has been reset' ) : sendMsg( userId,'✅ Your checked list has been reset' )
+                // sendMsg( userId,'😅' )        
+            })
+            .catch (err => {
+                console.log ( "reset read_file error : ", err)
+            })
+           }
+            
+                
         }catch(e){
             console.log("Error occurs : ",e)
             sendMsg(userId,"Sorry an internal error occurs, we're  fixing it")

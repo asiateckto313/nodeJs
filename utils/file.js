@@ -1,5 +1,6 @@
 
 const path = require('path');
+const { TODO_FILE } = require('../server');
 const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
 
 let fs = require("fs"),
@@ -89,9 +90,14 @@ saveTodo =   function(todolist){
   }
   return {error:false, data:"Nothing"}
   
-}, getUserTodos = async function(userId,todo_file){
+}, getUserTodos = async function(userId,todo_file_path = todo_file){
   try {
-    let todolist = await read_file(todo_file), todos = undefined,taille = todolist.length;
+    if (typeof todo_file_path === "undefined" || todo_file_path === null
+    || typeof todo_file_path !== "string" ) {
+      todo_file_path = TODO_FILE
+    }
+    let todolist = await read_file(todo_file_path), todos = undefined,taille = todolist.length;
+    
     if(taille){
       //bd non vide
       for(let i = 0 ; i < taille ; i++){
