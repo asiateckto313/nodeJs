@@ -54,39 +54,7 @@ try {
         console.log("todo_fr.get_command invoked")
         
         })
-        console.log(todolist.length)
-    
-        if(todolist.length ){
-           
-            for (let j=0; j < todolist.length; j++){
-                //Si jamais l'utilisateur userId a des todos alors on formalise le msg
-                if(userId == todolist[j].chat_id && todolist[j].todos.length > 0)
-                    message += fr_FR.serialize_msg_todolist_text + todoUtils.serialize_msg(todolist[j])
-                
-                    
-
-            }
-            if(checkedList.length)
-            for (let j=0; j < checkedList.length; j++)
-                if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                    message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg(checkedList[j])
-            
-        
-        }else{
-            if(!checkedList.length)
-                message = fr_FR.check_empty_text
-            else{
-                for (let j=0; j < checkedList.length; j++){
-                    if(userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                        message += fr_FR.serialize_msg_checklist_text + serialize_msg(checkedList[j])
-            }
-        }
-        
-        
-    }
-    console.log("todo_fr.get_command invoked")
-    return message
-    },
+        },
     remove_command = async  function(userId,todolist, todoIndex){
        try {  
             todoIndex = parseInt(todoIndex)

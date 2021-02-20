@@ -137,7 +137,7 @@ try {
                         if ( checkedList.length)
                             for (let j=0; j < checkedList.length; j++)
                                 if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                                msg += en_EN.serialize_msg_todolist_text + serialize_msg(checkedList[j])
+                                msg += en_EN.serialize_msg_checklist_text + serialize_msg(checkedList[j])
                        
                     }
                     resolve(msg)
@@ -241,20 +241,14 @@ try {
         
     },
     
-    check_command = function(todoIndex,todolist,checkedList,userId){
+    check_command = function( todoIndex,todolist, checkedList, userId ) {
         console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
-
        if ( verifyIndex(todoIndex,todolist,userId)){
            //L'index entré est validé nous allons d'abord récupérer le todo
-           let todo_to_check = undefined
-           
-            for(let i = 0; i < tailleTodoList ; i ++){
-                if ( todolist[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
-                    todo_to_check = todolist[i].todos[todoIndex-1]
-                    break;
-                }
-            }
+           let todo_to_check = undefined;
+           todo_to_check = todolist[todoIndex -1]
+
             if ( todo_to_check !== undefined){
                 if ( tailleCheckedList){
                     //Bd (table checkedList non vide)

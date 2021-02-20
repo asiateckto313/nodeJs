@@ -413,6 +413,10 @@ try{
                                             todoUtils.sendMsg( userId, en_EN.todo_added_text )
 
                                         }
+                                        
+                                        if ( command === 'check' )
+                                            todoUtils.check_command( instruction, todolist, checkList, userId )
+
                                         if ( command == "remove")
                                             todoUtils.remove_command( userId , todolist, instruction ) // Update the todolist array by removing one item
 
