@@ -7,6 +7,59 @@ const { getUserLang, addUserTodo } = require('./file');
 
 const todo_file = path.resolve('./todos.txt');
 
+let inlineKeyboard = {
+    inline_keyboard: [
+        [
+            {
+                text: 'Help',
+                callback_data: '/help'
+            }
+            
+        ],
+        [
+            {
+                text: 'Add',
+                callback_data: '/add'
+            },
+            {
+                text: 'Get',
+                callback_data: '/get'
+            }
+            
+        ],
+        [
+            {
+                text: 'Check',
+                callback_data: '/check'
+            },{
+                text: 'Remove',
+                callback_data: '/remove'
+            }
+        ],[
+            {
+                text: 'Reset',
+                callback_data: '/reset'
+            }
+        ],[
+            {
+                text: 'Set bot language',
+                callback_data: '/set_bot_lang'
+            }
+        ]
+    ]
+}, reset_option = {
+    inline_keyboard:[
+        [{
+            text:"My to do list",
+            callback_data: '/reset todolist'
+        }],[
+            {
+                text:"My checked list",
+                callback_data: '/reset checklist'
+            }
+        ]
+    ]
+};
 try {
     let fileUtils = require("./file"),
     telegram = require('telegram-bot-api'),
@@ -328,7 +381,9 @@ try {
         reset,
         help_command,
         sendMessage_with_inlineKey,
-        change_language_preference
+        change_language_preference,
+        inlineKeyboard,
+        reset_option
         
     }
     

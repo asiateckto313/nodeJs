@@ -18,59 +18,7 @@ let express = require('express'),
     api = todoUtils.api, 
     todolist = new Array(), checkList = new Array(),userId="";
 
-let  inlineKeyboard = {
-    inline_keyboard: [
-        [
-            {
-                text: 'Help',
-                callback_data: '/help'
-            }
-            
-        ],
-        [
-            {
-                text: 'Add',
-                callback_data: '/add'
-            },
-            {
-                text: 'Get',
-                callback_data: '/get'
-            }
-            
-        ],
-        [
-            {
-                text: 'Check',
-                callback_data: '/check'
-            },{
-                text: 'Remove',
-                callback_data: '/remove'
-            }
-        ],[
-            {
-                text: 'Reset',
-                callback_data: '/reset'
-            }
-        ],[
-            {
-                text: 'Set bot language',
-                callback_data: '/set_bot_lang'
-            }
-        ]
-    ]
-}, reset_option = {
-    inline_keyboard:[
-        [{
-            text:"My to do list",
-            callback_data: '/reset todolist'
-        }],[
-            {
-                text:"My checked list",
-                callback_data: '/reset checklist'
-            }
-        ]
-    ]
-}, langs_option = {
+let  langs_option = {
     inline_keyboard:[
         [{
             text:"English / Anglais",
@@ -424,8 +372,10 @@ try{
                                     else {
                                         if ( command == 'help')
                                             todoUtils.help_command(userId)
+
                                         if ( command == 'commands')
                                             todoUtils.sendMessage_with_inlineKey(userId,"*What do you want to do ?*",inlineKeyboard)
+
                                         if ( command == 'get' ) {
                                             todoUtils.get_command( todolist, checkList, userId ).then( msg => {
                                                 console.log ( "msg = ",msg )
@@ -438,6 +388,12 @@ try{
                                                 sendMsg(userId, "We are facing to trouble, we are fixing it")
                                                 console.log ( "get error = ", err)
                                             } )
+                                        }
+
+                                        if ( command == 'reset' ) {
+                                            //TODO reset
+                                            todoUtils.sendMsg( userId, "We are working on this feature" )
+                                            todoUtils.sendMessage_with_inlineKey( userId, "*What list do you want to reset ?*", todoUtils.reset_option )
                                         }
                                     }
 
