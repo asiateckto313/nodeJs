@@ -150,8 +150,8 @@ try {
         
     },
     remove_command = function(userId,todolist, todoIndex){
-    
-        let tailleTodoList = todolist.length
+        console.log("todolist = ", todolist)
+        let tailleTodoList = todolist.length;
         if ( tailleTodoList){
             
             todoIndex = parseInt(todoIndex)
@@ -214,6 +214,7 @@ try {
         else if (index <= 0 ) return false;
         else{
             if ( tailleArray){ // at least one item
+                if ( index > tailleArray ) return false
                 console.log("verifINDEX HERE")
                 for(let i = 0; i < tailleArray; i ++)
                     if ( array[i].chat_id == userId){
