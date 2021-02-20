@@ -3,6 +3,7 @@
 const path = require('path');
 const { token } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
+const { getUserLang, addUserTodo } = require('./file');
 
 const todo_file = path.resolve('./todos.txt');
 
@@ -149,25 +150,35 @@ try {
         });
         
     },
-    remove_command = function(userId,todolist, todoIndex){
-        console.log("todolist = ", todolist)
-        let tailleTodoList = todolist.length;
-        if ( tailleTodoList){
+    remove_command =  function( userId, todolist, todoIndex ) {
+        let tailleTodoList = todolist.length
+        console.log( todolist )
+        if ( tailleTodoList ) {
             
             todoIndex = parseInt(todoIndex)
-            if ( isNaN(todoIndex) ) sendMsg(userId,"Invalid index")
-            if (  todoIndex <= 0 ) sendMsg(userId,"Can not remove empty todos")
-            else{
-            
-                for(let i = 0; i < tailleTodoList; i++)
-                    if ( todolist[i].chat_id == userId){
-                        if ( todoIndex > todolist[i].todos.length) {sendMsg(userId,"Invalid index"); removed =false; return}
-                            todolist[i].todos.splice(todoIndex-1,1)
-                        //if ( !todolist[i].todos.length) todolist.splice(i,1)
+            if ( isNaN(todoIndex) ) sendMsg( userId, "Invalid index" )
+            if (  todoIndex <= 0 ) sendMsg( userId, "Can not remove empty todos" )
+            else {
+
+                if ( todoIndex > tailleTodoList ) { sendMsg(userId,"Invalid index") ; return }
+                todolist.splice( todoIndex-1, 1 )
+
+                getUserLang( userId, todo_file )
+                .then ( user_lang => {
+
+                    addUserTodo( userId, user_lang.data , todolist, todo_file)
+                    .then ( response => {
                         sendMsg(userId,"Todo removed 👍")  
-                        break;
-                        //return todolist
-                    }
+                    } )
+                    .catch ( err => {
+                        console.log ( "err = ", err)
+                    } )
+                } )
+                .catch( err2 => {
+                    console.log ( "err2 = ", err2 )
+                } )
+
+                
             }
                     
         }else{

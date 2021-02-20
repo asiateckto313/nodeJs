@@ -403,6 +403,9 @@ try{
                                 } else  { 
                                     //syntaxes brutes
                                     if ( instruction ) {
+                                        todolist = await fileUtils.getUserTodos(userId, fileUtils.todo_file)
+                                        todolist = todolist.todos
+
                                         if ( command == 'add' ) {
                                         
                                             todoUtils.add_command( todolist, userId , instruction, user_lang )
