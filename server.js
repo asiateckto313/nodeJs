@@ -404,6 +404,7 @@ try{
             
                     }//Fin de if message.entities
                     else {
+                        
                         //On a reçu un message sans le "/", on vérifie s'il s'agit d'une réponse de la part des boutons
                         if ( set_lang_inline ) {
                             console.log ( "Dans le set_lang_inline")
@@ -431,6 +432,16 @@ try{
                             todoUtils_fr.check_command(parseInt(message.text.trim()),todolist,checkList,userId)
                             check_inline = false
                         }
+
+                        // Le message envoyé n'est ni une commande ni une réponse de la part des boutons
+                        sendMsg (userId , "😅")
+                        setTimeout( () => {
+                            if ( result.data === "english" ) 
+
+                         sendMsg( userId, en_EN.not_a_bot_command)
+                         
+                        else sendMsg( userId , fr_FR.not_a_bot_command)
+                        }, 50)
                     }
         
                 }
