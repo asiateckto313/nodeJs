@@ -3,21 +3,33 @@ Concevoir un bot de gestion des tâches quotidiennes par l'ajout, la suppression
 	2. Mode non brut(e) : avec les boutons
 
 Première version : 
-	Lorsque l'utilisateur entre, démarre le bot l'on lui souhaite la bienvenue et lui propose déjà de choisir la langue (pour l'instant français ou anglais). Une fois la langue choisie, on peut lui afficher le menu qui sera envoyé automatiquement à la fin de toute action de sorte à éviter à l'utilisateur de procéder à l'utilisateur d'utiliser la syntaxe brute sans pour autant retirer le mode brut pour ces utilisateurs qui aimeront 
+	Lorsque l'utilisateur entre, démarre le bot l'on lui souhaite la bienvenue et lui propose déjà de choisir la langue (pour l'instant français ou anglais). Une fois la langue choisie, on peut lui afficher le menu qui sera envoyé automatiquement à la fin de toute action de sorte à éviter à l'utilisateur d'utiliser la syntaxe brute sans pour autant retirer le mode brut pour ces utilisateurs qui aimeront bien l'utiliser
 
 	Penser à un menu help un peu intéractif : lorsque l'utilisateur envoie /help à la manière de Expense Bot et selon la langue choisie on lui demande le help de quelle commande il souhaite avoir sinon on lui envoie le help total
 
 Deuxième version : (se former d'abord sur le inlineKeyBoard)
 	Elle se fera en deux sous étapes : 
 	1. Optimisation du code de la v1
-	2. La logique reste la même seulement qu'au lieu d'envoyer à chaque fois les boutons de commandes après que l'utilisateur ait terminé une action, nous aurons les boutons déjà dans le clavier
+	2. La logique reste la même seulement qu'au lieu d'envoyer à chaque fois les boutons de commandes après que l'utilisateur ait terminé une action, nous aurons les boutons déjà dans le clavier (comme ce que FY a suggéré)
 
 Fonctionnalités à mettre en place : 
-/TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
-//TODO ajouter une commande /newpost se basant sur l'id du owner (moi) pour pouvoir envoyer un message à tout mes abonnés
+//TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
+//TODO ajouter une commande /newpost se basant sur l'id du owner (moi) pour pouvoir envoyer un message à tous mes abonnés
 //TODO Enregistrer les préférences par utilisateurs (langue, reminder frequency)
 //TODO ajouter le temps auquel un todo a été ajouté ou marqué comme terminé
-//TODO faire une vérification avant la fin de la journée pour chaque utilisateur afin de savoir s'il a terminé toutes
-//les tâches et lui envoyer un gif de félécitations
+//TODO faire une *vérification avant la fin de la journée* pour chaque utilisateur afin de savoir s'il a terminé toutes les tâches et lui envoyer un gif de félicitations (les confettis comme dans basketball sticker when you goal)
 //TODO penser à faire des catégories pour les todos; permettra de lister pour telle catégorie les todos qui y sont
+
+/*******************Remarques et ajouts d'idées************************/
+Date : Feb 20th, 2021
+Author: Elsa T.
+
+*...* : Je pense que tant qu'on a pas mis en place les reminders et autres, vérifier à la fin de la journée n'est pas nécessaire
+Pour le moment, si toutes les tâches ont été checked, quelque soit le temps pris pour les cocher, on le félicite et c'est bon
+
+Sinon y a rien à dire sur les fonctionnalités 
+Y a déjà un peu de tout !
+Bravo @superPablo_E!!
+
+/***********************************************************************/
