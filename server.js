@@ -455,9 +455,12 @@ try{
                  
                         if ( add_inline ) {
                                     
-                            todoUtils_fr.add_command(todolist,userId,message.text.trim(),user_lang)
+                            todoUtils_fr.add_command( todolist , userId , message.text.trim() , user_lang )
                             // fileUtils.saveTodo(todolist)
-                            todoUtils.sendMsg(userId,fr_FR.todo_added_text)
+                            if ( user_lang === 'english' ) 
+                             todoUtils.sendMsg( userId,en_EN.todo_added_text ) 
+                            else
+                             todoUtils.sendMsg(userId,fr_FR.todo_added_text)
                             add_inline = false
                             
                         } else  if ( remove_inline ) { 
