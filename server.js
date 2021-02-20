@@ -406,10 +406,21 @@ try{
                                     check_inline = false
                                 } else  { 
                                     //syntaxes brutes
-                                    if ( command == 'help')
-                                        todoUtils.help_command(userId)
-                                    if ( command == 'commands')
-                                        todoUtils.sendMessage_with_inlineKey(userId,"*What do you want to do ?*",inlineKeyboard)
+                                    if ( instruction ) {
+                                        if ( command == 'add' ) {
+                                        
+                                            todoUtils.add_command( todolist, userId , instruction, user_lang )
+                                            //fileUtils.saveTodo(todolist)
+                                            todoUtils.sendMsg( userId, en_EN.todo_added_text )
+
+                                        }
+                                    }
+                                    else {
+                                        if ( command == 'help')
+                                            todoUtils.help_command(userId)
+                                        if ( command == 'commands')
+                                            todoUtils.sendMessage_with_inlineKey(userId,"*What do you want to do ?*",inlineKeyboard)
+                                    }
 
                                 }
                             }
