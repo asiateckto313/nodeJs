@@ -1,4 +1,5 @@
 const path = require('path');
+const { inlineKeyboard, reset_option } = require('./langs/en_EN');
 const { initBd } = require('./utils/file');
 const { saveMessage } = require('./utils/messages');
 const { sendMsg } = require('./utils/todo');
