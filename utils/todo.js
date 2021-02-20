@@ -129,14 +129,14 @@ try {
                     let todos = res.todos, taille = todos.length;
                     // console.log("todos = ", todos )
                     if ( taille){
-                        msg += en_EN.serialize_msg_todolist_text + todoUtils.serialize_msg(res)
-                        console.log(message)
+                        msg += en_EN.serialize_msg_todolist_text + serialize_msg(res)
+                        console.log(msg)
 
                         
                         if ( checkedList.length)
                             for (let j=0; j < checkedList.length; j++)
                                 if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                                msg += en_EN.serialize_msg_todolist_text + todoUtils.serialize_msg(checkedList[j])
+                                msg += en_EN.serialize_msg_todolist_text + serialize_msg(checkedList[j])
                        
                     }
                     resolve(msg)
@@ -147,38 +147,7 @@ try {
         console.log("get_command invoked")
         
         });
-        let message = "",tmp = fileUtils.getUserTodos(userId,todo_file) ;
-        console.log(todolist.length)
-        console.log("temp = ",tmp)
-        if ( todolist.length ){
-           
-            for (let j=0; j < todolist.length; j++){
-                //Si jamais l'utilisateur userId a des todos alors on formalise le msg
-                if ( userId == todolist[j].chat_id && todolist[j].todos.length > 0)
-                    message += "Your todos :\n" + serialize_msg(todolist[j])
-                
-                    
-
-            }
-            if ( checkedList.length)
-            for (let j=0; j < checkedList.length; j++)
-                if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                    message += "\n\nYour todos_checked :\n" + serialize_msg(checkedList[j])
-            
         
-        }else{
-            if ( !checkedList.length)
-                message = "⚠️ You don't have any todo, please add one before showing the list."
-            else{
-                for (let j=0; j < checkedList.length; j++){
-                    if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                        message += "Your todos_checked :\n" + serialize_msg(checkedList[j])
-            }
-        }
-        
-        
-    }
-    return message
     },
     remove_command = function(userId,todolist, todoIndex){
     

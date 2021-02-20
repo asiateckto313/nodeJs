@@ -1,6 +1,7 @@
 const path = require('path');
 const { initBd } = require('./utils/file');
 const { saveMessage } = require('./utils/messages');
+const { sendMsg } = require('./utils/todo');
 const todo_file = path.resolve('./todos.txt');
 const messages_file = path.resolve ( "./messages.txt" );
 const PORT = 3010,heure_ms = 3600 *1000, jour_ms = heure_ms * 24, annee_ms = jour_ms * 365;
@@ -341,16 +342,11 @@ try{
                                         if ( command == 'add' ) {
                                     
                                             todoUtils_fr.add_command(todolist,userId,instruction,user_lang)
-                                            //fileUtils.saveTodo(todolist)
                                             todoUtils.sendMsg(userId,fr_FR.todo_added_text)
 
                                         }
                                             
-                                            // todoUtils_fr.add_command(todolist,userId,instruction,user_lang)
-                                            // fileUtils.saveTodo(todolist)
-
-                                            // todoUtils.sendMsg(userId,fr_FR.todo_added_text)
-                                        
+                                           
                                         if ( command === "reset") { console.log ( "reset") }
 
                                         if ( command == "remove")
@@ -420,6 +416,19 @@ try{
                                             todoUtils.help_command(userId)
                                         if ( command == 'commands')
                                             todoUtils.sendMessage_with_inlineKey(userId,"*What do you want to do ?*",inlineKeyboard)
+                                        if ( command == 'get' ) {
+                                            todoUtils.get_command( todolist, checkList, userId ).then( msg => {
+                                                console.log ( "msg = ",msg )
+                                                if ( msg !== "" )
+                                                    todoUtils.sendMsg( userId, msg )
+                                                else
+                                                    todoUtils.sendMsg( userId, en_EN.check_empty_text ) 
+                                            })
+                                            .catch ( err => {
+                                                sendMsg(userId, "We are facing to trouble, we are fixing it")
+                                                console.log ( "get error = ", err)
+                                            } )
+                                        }
                                     }
 
                                 }
