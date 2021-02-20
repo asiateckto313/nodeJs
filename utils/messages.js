@@ -9,13 +9,12 @@ saveMessage = function ( message_file , message) {
         let messageObj  = { userId : message.from.id, messages : [ { message_id : message.message_id,
             date : message.date } ]
             }
-            console.log (messageObj)
 
         if (  messagesParsed.length ) {
             //Existence d'au moins un user dans le fichier messages.txt
             // recherche des messages de l'utilsateur userId
             let userIdMessages = messagesParsed.filter ( message => message.userId === messageObj.userId );
-            console.log ( "userIdMessages = ", userIdMessages )
+            // console.log ( "userIdMessages = ", userIdMessages )
             if ( ! userIdMessages.length ) {
                 // L'utilisateur n'a pas encore envoyé de message au bot
                 
@@ -23,10 +22,8 @@ saveMessage = function ( message_file , message) {
         
             } else {
                 //Sinon on l'ajoute
-                console.log("SINON")
                 userIdMessages[0].messages.push(  { message_id : message.message_id, date : message.date }  )
 
-                console.log( " messagesParsed after push : ", messagesParsed )
             }
 
            
@@ -43,6 +40,9 @@ saveMessage = function ( message_file , message) {
             console.log('The message has been saved!');
         } )
     } )
+    .catch ( err => {
+        console.log( "saveMessage error = ", err)
+    })
 };
 
 module.exports = {
