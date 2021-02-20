@@ -159,46 +159,41 @@ try {
         console.log("todo = ",todo)
         fileUtils.addUserTodo(userId,user_lang,todo,todo_file)
     },
-    serialize_msg = function(array){
+    serialize_msg = function( array ) {
         let message = ""
-            if ( array.todos){
-                for(let i = 0; i < array.todos.length; i++)
-                    message += "🕒: "+(i+1) + " - " +array.todos[i]+"\n"
-    
-            }else if (array.todos_checked){
-                for(let i = 0; i < array.todos_checked.length; i++)
-                    message += "✅: "+ (i+1) + " - " +array.todos_checked[i]+"\n"
+            if ( array.todos ) {
+                for( let i = 0; i < array.todos.length; i++ )
+                    message += "🕒: "+(i+1) + " - " +array.todos[ i ]+"\n"
     
             }
-            console.log(message)
+            if ( array.todos_checked ) {
+                if ( array.todos_checked.length ) {  
+                    message += en_EN.serialize_msg_checklist_text
+                
+                    for( let i = 0; i < array.todos_checked.length; i++ )
+                        message += "✅: "+ (i+1) + " - " +array.todos_checked[ i ]+"\n"
+                }
+            }
 
             console.log("todo.serialize_msg invoked")
         return message
     },
     
-    get_command =  function(todolist,checkedList,userId){
+    get_command =  function( todolist , checkedList , userId){
         let msg = "";
         return new Promise((resolve, reject) => {
-            fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
-                // console.log("res = ",res)
-                if ( !res.error){
-                    let todos = res.todos, taille = todos.length;
-                    // console.log("todos = ", todos )
-                    if ( taille){
-                        msg += en_EN.serialize_msg_todolist_text + serialize_msg(res)
-                        console.log(msg)
-
-                        
-                        if ( checkedList.length)
-                            for (let j=0; j < checkedList.length; j++)
-                                if ( userId == checkedList[j].chat_id && checkedList[j].todos_checked.length > 0)
-                                msg += en_EN.serialize_msg_checklist_text + serialize_msg(checkedList[j])
-                       
-                    }
-                    resolve(msg)
+            read_file( todo_file )
+            .then ( bdContent => {
+                let user = bdContent.filter ( users => users.chat_id === userId)
+                if ( user[ 0 ].todos && user[ 0 ].todos.length ) {
+                    // L'utilisateur a au moins un todo
+                    msg += en_EN.serialize_msg_todolist_text + serialize_msg( user[ 0 ] )
                 }
-            }).catch(e=>{
-                reject(e)
+
+                resolve ( msg )
+
+            } ) .catch ( e => {
+                reject ( e )
             })
         console.log("get_command invoked")
         
@@ -296,16 +291,16 @@ try {
         
     },
     
-    check_command = function( todoIndex,todolist, checkedList, userId ) {
+    check_command = function( todoIndex, todolist, checkedList, userId ) {
         console.log("userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
-       if ( verifyIndex(todoIndex,todolist,userId)){
+       if ( verifyIndex( todoIndex, todolist, userId ) ) {
            //L'index entré est validé nous allons d'abord récupérer le todo
            let todo_to_check = undefined;
-           todo_to_check = todolist[todoIndex -1]
+           todo_to_check = todolist[ todoIndex -1 ]
 
-            if ( todo_to_check !== undefined){
-                if ( tailleCheckedList){
+            if ( todo_to_check !== undefined ) {
+                if ( tailleCheckedList ) {
                     //Bd (table checkedList non vide)
                     let found = false;
                     console.log("Bd non vide")
@@ -319,7 +314,7 @@ try {
                             break;
                         }
                     }
-                    if ( !found) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
+                    if ( !found ) {// Si l'utilisateur n'y figure pas alors c'est son premier ajout
                     checkedList.push({chat_id:userId,todos_checked:[todo_to_check]})
                     remove_command(userId,todolist,todoIndex)
 
@@ -333,7 +328,25 @@ try {
             }
             
             console.log("checkedList : ",checkedList)
+            read_file ( todo_file )
+            .then ( bdContend => {
+                // console.log ("bdContend = ", bdContend)
+                let userCheckedLists = bdContend.filter (user => userId === user.chat_id);
+                if ( userCheckedLists[ 0 ].todos_checked && userCheckedLists[ 0 ].todos_checked.length )
+                    userCheckedLists[ 0 ].todos_checked.concat(checkedList[ 0 ].todos_checked)
+                else 
+                    userCheckedLists[ 0 ].todos_checked = checkedList[ 0 ].todos_checked
+                console.log ("userCheckedLists[ 0 ] = ", userCheckedLists[ 0 ])
+
+                saveTodo( bdContend )
+
+            })
+            .catch ( err => {
+                sendMsg( userId, "Something went wrong with this command, we are fixing it. \nDon't forget to text me if this error occurs one more time : @superPablo_E")
+                console.log( "check_command read_file error : ", err)
+            } )
             sendMsg(userId, "Added to the checked list. We are removing your todo")
+
             return;
                 
                     

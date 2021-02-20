@@ -122,7 +122,8 @@ saveTodo =   function(todolist){
       user.todos.push(todos.split('\n')[i])
   else user = {chat_id: userId, lang: user_lang, todos: [todos]}
   return user
-} ,addUserTodo = async function (userId,user_lang,todo,todo_file){
+} ,
+addUserTodo = async function (userId,user_lang,todo,todo_file){
   try {
     // console.log("addUser debut")
     let todolist = await read_file(todo_file),taille_bd = todolist.length;

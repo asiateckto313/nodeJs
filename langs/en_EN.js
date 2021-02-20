@@ -40,7 +40,7 @@ wrong_syntax = "❌ Wrong syntax, please take a look to the right syntax by send
 welcome_command_text = function(username){
     return "Hello @"+ username+" and thank you for using my bot. Let me know if any problem occurs because it's my first bot. Hope you will enjoy 😏."},
 check_command_text = "Added to the checked list 👍👍. Please remove this todo from your todos.",invalid_index_text= "Invalid index ", remove_command_text = "Todo removed 👍👍 😊",
-serialize_msg_todolist_text = "Your todos : \n",serialize_msg_checklist_text = "\n\nYour todos checked : \n",check_empty_text= "⚠️ You don't have any todo, please add one before showing the list.",
+serialize_msg_todolist_text = "Your todos : \n",serialize_msg_checklist_text = "\nYour todos checked : \n",check_empty_text= "⚠️ You don't have any todo, please add one before showing the list.",
 remove_empty_todo = "😕Sorry, cannot delete a list with no content. Please add a todo before removing it.";
 let  inlineKeyboard = {
     inline_keyboard: [

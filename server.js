@@ -186,50 +186,11 @@ try{
             fileUtils.setUserLang(userId,result.data.instruction);
         }
 
-
-       /* if ( result.data.command == 'set_bot_lang' ) {
-            set_lang_inline = true
-            if ( !result.data.instruction)
-                todoUtils_fr.sendMessage_with_inlineKey(userId,"*Choose the language*",langs_option)
-            else { 
-                if ( result.data.instruction.trim().toLowerCase()=='english' ) {
-                    todoUtils.change_language_preference(userId,'english',todo_file)
-                    set_lang_inline = false
-                    todoUtils.sendMsg(userId,"✅ Language set to English")
-                    console.log ( "newcomer english : ",newcomer)
-
-                    if ( newcomer) todoUtils.welcome_command(userId,username) 
-                    else console.log ( newcomer = newcomer);
-                    newcomer = false;
-
-                }
-                if ( result.data.instruction.trim().toLowerCase() == 'french' ) {
-                    todoUtils.change_language_preference(userId,'french',todo_file)
-                    set_lang_inline = false
-                    todoUtils.sendMsg(userId,"✅ Langue choisie : Français")
-                    console.log ( "newcomer french : ",newcomer)
-                    if ( newcomer)  todoUtils_fr.welcome_command(userId,username)
-                    else newcomer = newcomer;
-                    newcomer = false
-                }
-            }
-        }
-
-        if ( result.data.command === "reset") {
-            if (!result.data.instruction) {// on a rçu de /commands
-            }
-            if ( result.data.instruction === "checklist") {}
-
-
-        }
-
-        if ( result.data.command == "help" ) {
-            (user_lang == "english") ? todoUtils.help_command(userId) : todoUtils_fr.help_command(userId)
-        }*/
     });
     
     api.on( 'message', function( message ) {
         // A la réception d'un message, on sauvegarde dans messages.txt afin de pouvoir effacer les messages de plus de 24h
+        // console.log ( 'on message, message received = ', message)
         saveMessage ( messages_file, message )
         let user_lang = undefined;
         userId = message.from.id, username = message.from.username, message_id = message.message_id,
