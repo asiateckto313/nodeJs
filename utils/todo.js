@@ -333,7 +333,7 @@ try {
                 // console.log ("bdContend = ", bdContend)
                 let userCheckedLists = bdContend.filter (user => userId === user.chat_id);
                 if ( userCheckedLists[ 0 ].todos_checked && userCheckedLists[ 0 ].todos_checked.length )
-                    userCheckedLists[ 0 ].todos_checked.concat(checkedList[ 0 ].todos_checked)
+                   userCheckedLists[ 0 ].todos_checked =  userCheckedLists[ 0 ].todos_checked.concat(checkedList[ 0 ].todos_checked)
                 else 
                     userCheckedLists[ 0 ].todos_checked = checkedList[ 0 ].todos_checked
                 console.log ("userCheckedLists[ 0 ] = ", userCheckedLists[ 0 ])
