@@ -1,13 +1,11 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
-const { response } = require('express');
-const { url } = require('inspector');
 const path = require('path');
 const { token } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
-const { TODO_FILE } = require('../server');
-const { getUserLang, addUserTodo, getUserTodos, read_file, saveTodo } = require('./file');
+const { getUserLang, addUserTodo, read_file, saveTodo } = require('./file');
 const { makeGestRequest } = require('./request');
+const mediaTimeOut = 1000 * 60 * 7;
 
 const todo_file = path.resolve('./todos.txt');
 
@@ -86,33 +84,62 @@ try {
                 tmp += instruction[ i ] + " "
             tmp = tmp.trim();
 
-            makeGestRequest(url)
-            .then( response => {
-                commandBotLists = response.result
-                let verification = commandBotLists.filter (commandsBot => commandsBot.command === command)
-                // console.log ("verification = ", verification)
-                if ( ! verification.length ) {
-                    //La commande envoyée ne fait pas partie des commandes du bot
-                    api.deleteMessage( {
-                        //On la supprime
-                        chat_id : message.chat.id || message.from.id,
-                        message_id : message.message_id 
-                    } , (err , result) => {
-                        if ( err ) { 
-                            console.log( "Error while deleting ")
-                            return
-                        }
-                        console.log(" Message deleted ✅" )
-                    })
-                }
-            })
-            .catch ( err => {
+           
+                /* // Decomment on production to verify the commands
+                makeGestRequest(url)
+                .then( response => {
+                    commandBotLists = response.result
+                    let verification = commandBotLists.filter (commandsBot => commandsBot.command === command)
+                    // console.log ("verification = ", verification)
+                    if ( ! verification.length ) {
+                        //La commande envoyée ne fait pas partie des commandes du bot
+                        api.deleteMessage( {
+                            //On la supprime
+                            chat_id : message.chat.id || message.from.id,
+                            message_id : message.message_id 
+                        })
+                        .then (response => {
+                            console.log ("Message deleted ✅")
+                        })
+                        .catch (err => {
+                            console.log ("whichCommand deleteMessage error : ", err)
+                        })
+                    }
+                })
+                .catch ( err => {
                     console.log("whichCommand get error : ", err)
                 })
-            
+            */
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command
+                /* if (command === "myfirstProfilePhotoProfile") {
+                    api.getUserProfilePhotos( {
+                        user_id : message.from.id
+                    })
+                    .then ( response => {
+                        let photos = response.photos
+                        console.log(photos[0].slice(-1)[0].file_id)
+                        api.sendPhoto(
+                            {
+                                 // headers : {'Content-Type' : `multipart/form-data;`},
+            
+                                chat_id : message.from.id,
+                                caption : "YOUR FIRST PROFILE PHOTO",
+                                photo :  photos[0].slice(-1)[0][0].file_id || photos[0][0].file_id 
+                            }
+                        ) .then( response => {
+                            console.log ( "sendPhoto response = ", response)
+                        }) .catch ( err => {
+                            console.log ("sendPhoto error : ", err.error)
+                        })
+                        
+                    })
+                    .catch (err => {
+                        console.log ("getUserProfilePhotos error : ", err)
+                    })
+                    return
+                } */
                 return { error : false , "data": { "command" : command } }
                 
             } else {
@@ -125,13 +152,7 @@ try {
             console.log( "Dans le catch" )
 
             try {
-                makeGestRequest(url)
-                .then( response => {
-                    console.log( "get response = ", response)
-                })
-                .catch ( err => {
-                    console.log("whichCommand get error : ", err)
-                })
+               
                
             if ( message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
             
@@ -140,6 +161,37 @@ try {
                 instruction = message.data.split(' ')[1]
                 
             }
+
+            /* if (command === "/myfirstProfilePhotoProfile") {
+                api.getUserProfilePhotos( {
+                    user_id : message.from.id
+                })
+                .then ( response => {
+                    let photos = response.photos
+                    api.sendPhoto(
+                        {
+                             // headers : {'Content-Type' : `multipart/form-data;`},
+        
+                            chat_id : userId,
+                            caption : "YOUR FIRST PROFILE PHOTO",
+                            photo :  photos[0].file_id 
+                        }
+                    ) .then( response => {
+                        let congratMessageId = response.message_id
+                        setTimeout(() => {
+                            
+                        }, mediaTimeOut);
+                    }) .catch ( err => {
+                        console.log ("sendPhoto error : ", err.error)
+                    })
+                    
+                })
+                .catch (err => {
+                    console.log ("getUserProfilePhotos error : ", err)
+                })
+                return
+            } */
+
             return { error : false , "data" : { "command" : command , "instruction" : instruction } }
 
         } catch ( f ) {
@@ -196,11 +248,14 @@ try {
     serialize_msg = function( array ) {
         let message = ""
             if ( array.todos ) {
+                console.log ("todos")
+
                 for( let i = 0; i < array.todos.length; i++ )
                     message += "🕒: "+(i+1) + " - " +array.todos[ i ]+"\n"
     
             }
             if ( array.todos_checked ) {
+                console.log ("todos_checked")
                 if ( array.todos_checked.length ) {  
                     message += en_EN.serialize_msg_checklist_text
                 
@@ -222,9 +277,39 @@ try {
                 if ( user[ 0 ].todos && user[ 0 ].todos.length ) {
                     // L'utilisateur a au moins un todo
                     msg += en_EN.serialize_msg_todolist_text + serialize_msg( user[ 0 ] )
+                } else {
+                    //L'utilisateur n'a peut être pas de todos mais check tous ses todo
+                    if ( ! user[ 0 ].todos.length && user[ 0 ].todos_checked 
+                        && user [ 0 ].todos_checked.length ) {
+                           // L'utilisateur a check tous ses todos
+                           api.sendPhoto(
+                               {
+                                    // headers : {'Content-Type' : `multipart/form-data;`},
+
+                                   chat_id : userId,
+                                   caption : "🥳 CONGRATULATIONS YOU'VE CHECKED ALL YOUR TODOS 🤩",
+                                   photo :  'AgACAgQAAxkDAAIH-mAyNqyaKnJ0OfuOdx5zb2QkeOiiAAKCtTEbd3KQUV5qMd9Wza03qGcaJ10AAwEAAwIAA3kAA5luBQABHgQ' || 
+                                            path.resolve( "./public/assets/img/congratulations.jpg" ) 
+                               }
+                           ) .then( response => {
+                               console.log ( "congratulation photo sent ✅ ")
+                           }) .catch ( err => {
+                               console.log ("sendPhoto error : ", err.error)
+                           })
+                           api.sendAudio({
+                               chat_id : userId,
+
+                               audio : 'CQACAgQAAxkDAAIH-2AyNrL2L-gLqeHvebey8Rp8VVioAAIJCAACd3KQUZsB3DTRkgZ9HgQ' || path.resolve("./public/assets/audio/celebration.mp3")
+                           }).then( response => {
+                            console.log ( "sendAudio response = ", response)
+                            }) .catch ( err => {
+                                console.log ("sendAudio error : ", err.error)
+                            })
+                        }
                 }
 
-                resolve ( msg )
+                (msg !== '') ? sendMsg( userId , msg ) : ''
+
 
             } ) .catch ( e => {
                 reject ( e )

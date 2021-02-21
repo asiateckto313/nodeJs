@@ -19,6 +19,9 @@ let express = require('express'),
     api = todoUtils.api, 
     todolist = new Array(), checkList = new Array(),userId="";
 
+app.use('/public', express.static(__dirname+'/document'))
+
+
 let  langs_option = {
     inline_keyboard:[
         [{
@@ -52,7 +55,7 @@ try{
         // S'il n'a pas de username on récupère son prénom
         (username == undefined || username == "-") ? username = message.message.chat.first_name : username = username;
         
-        
+       
         // Vérification de l'existence de l'utilisateur ainsi que de sa préférence linguistique
         let user_lang = await fileUtils.getUserLang(userId, fileUtils.todo_file);
         console.log ( user_lang.data, user_lang)
@@ -67,6 +70,9 @@ try{
                             todoUtils.sendMsg(userId,msg)
                         else
                             todoUtils.sendMsg(userId,en_EN.check_empty_text)
+                    })
+                    .catch (err => {
+                        console.log ("inline get_command error : ", err)
                     })
                     
                 }
@@ -192,6 +198,7 @@ try{
         // A la réception d'un message, on sauvegarde dans messages.txt afin de pouvoir effacer les messages de plus de 24h
         // console.log ( 'on message, message received = ', message)
         saveMessage ( messages_file, message )
+        
         let user_lang = undefined;
         userId = message.from.id, username = message.from.username, message_id = message.message_id,
         message_date = message.date;
@@ -202,7 +209,7 @@ try{
 
         fileUtils.getUserLang( userId,fileUtils.todo_file ).then(async (result) => {
             //Récupération du langage défini par l'utilisateur
-            console.log (  "getUserLang result = ", result )
+            // console.log (  "getUserLang result = ", result )
             if ( ! result.error ) {
                 user_lang = result.data
                 if ( user_lang == 'Nothing' || user_lang == "undefined" ) {// Nous avons affaire à un nouvel utilisateur
@@ -278,10 +285,10 @@ try{
                                         if ( command == 'get' ) {
                                             todoUtils_fr.get_command(todolist,checkList,userId).then(msg => {
                                                 console.log ( "msg = ",msg)
-                                                if ( msg !== "")
+                                                /* if ( msg !== "")
                                                     todoUtils.sendMsg(userId,msg)
                                                 else
-                                                    todoUtils.sendMsg(userId,fr_FR.check_empty_text)
+                                                    todoUtils.sendMsg(userId,fr_FR.check_empty_text) */
                                             })
                                             
                                         }
