@@ -419,7 +419,7 @@ try{
             } // Fin de if (!result.error)
 
         }).catch( ( e ) => {
-            //Le fichier est vide
+            //Le fichier est vveovenrveezejfaeide
             console.log ( "Fichier vide, première insertion : ", e )
         })
 

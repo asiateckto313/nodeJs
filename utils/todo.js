@@ -62,6 +62,7 @@ let inlineKeyboard = {
         ]
     ]
 };
+
 try {
     let fileUtils = require("./file"),
     telegram = require('telegram-bot-api'),
