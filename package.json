@@ -15,6 +15,7 @@
   "author": "Paul-Marie TATI",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "cookie-session": "^1.4.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

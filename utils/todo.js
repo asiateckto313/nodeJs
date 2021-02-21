@@ -1,11 +1,13 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
 const { response } = require('express');
+const { url } = require('inspector');
 const path = require('path');
 const { token } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
 const { TODO_FILE } = require('../server');
 const { getUserLang, addUserTodo, getUserTodos, read_file, saveTodo } = require('./file');
+const { makeGestRequest } = require('./request');
 
 const todo_file = path.resolve('./todos.txt');
 
@@ -74,7 +76,8 @@ try {
     }),
     
     whichCommand = function ( message ) {
-        let command = undefined, instruction = undefined, tmp = "";
+        let command = undefined, instruction = undefined, tmp = "",
+            url = `https://api.telegram.org/bot${token}/getMyCommands`;
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
@@ -83,6 +86,30 @@ try {
                 tmp += instruction[ i ] + " "
             tmp = tmp.trim();
 
+            makeGestRequest(url)
+            .then( response => {
+                commandBotLists = response.result
+                let verification = commandBotLists.filter (commandsBot => commandsBot.command === command)
+                // console.log ("verification = ", verification)
+                if ( ! verification.length ) {
+                    //La commande envoyée ne fait pas partie des commandes du bot
+                    api.deleteMessage( {
+                        //On la supprime
+                        chat_id : message.chat.id || message.from.id,
+                        message_id : message.message_id 
+                    } , (err , result) => {
+                        if ( err ) { 
+                            console.log( "Error while deleting ")
+                            return
+                        }
+                        console.log(" Message deleted ✅" )
+                    })
+                }
+            })
+            .catch ( err => {
+                    console.log("whichCommand get error : ", err)
+                })
+            
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command
@@ -98,7 +125,14 @@ try {
             console.log( "Dans le catch" )
 
             try {
-
+                makeGestRequest(url)
+                .then( response => {
+                    console.log( "get response = ", response)
+                })
+                .catch ( err => {
+                    console.log("whichCommand get error : ", err)
+                })
+               
             if ( message.data.split(' ').length == 1) command = message.data.split(' ')[0].trim().split('/')[1].toLowerCase()
             
             if ( message.data.split(' ').length == 2) {
