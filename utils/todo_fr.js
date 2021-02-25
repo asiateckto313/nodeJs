@@ -55,7 +55,7 @@ try {
         
         })
         },
-    remove_command = async  function(userId,todolist, todoIndex){
+    remove_command = async  function( userId, todolist, todoIndex){
        try {  
             todoIndex = parseInt(todoIndex)
             if(isNaN(todoIndex) ) todoUtils.sendMsg(userId,fr_FR.invalid_index_text)
@@ -101,7 +101,7 @@ try {
     
     },
     
-    isTheRightSyntax = function(message){
+    isTheRightSyntax = function( message ) {
         //De base on suppose que c'est la bonne syntaxe
         todoUtils.isTheRightSyntax(message)
     }, 

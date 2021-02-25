@@ -1,6 +1,5 @@
 
 const path = require('path');
-const { TODO_FILE } = require('../server');
 const todo_file = path.resolve("./todos.txt");//"/Users/pablo_e/Desktop/Programmes en nodeJs/telegram_api/todos.txt",
 
 let fs = require("fs"),
@@ -94,7 +93,7 @@ saveTodo =   function(todolist){
   try {
     if (typeof todo_file_path === "undefined" || todo_file_path === null
     || typeof todo_file_path !== "string" ) {
-      todo_file_path = TODO_FILE
+      todo_file_path = todo_file
     }
     let todolist = await read_file(todo_file_path), todos = undefined,taille = todolist.length;
     

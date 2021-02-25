@@ -1,9 +1,9 @@
 //TODO try to think about reminder feature, if the todos added take a long time to be checked, send a message or a notification
 //TODO really later think about add a due date for a todo to get reminded
 const path = require('path');
-const { token, mode } = require('../config/envparam');
+const { token, mode, admins_id } = require('../config/envparam');
 const en_EN = require('../langs/en_EN');
-const { getUserLang, addUserTodo, read_file, saveTodo } = require('./file');
+const { getUserLang, addUserTodo, read_file, saveTodo, getUserTodos } = require('./file');
 const { makeGestRequest } = require('./request');
 const mediaTimeOut = 1000 * 60 * 7;
 
@@ -76,7 +76,8 @@ try {
     
     whichCommand = function ( message ) {
         let command = undefined, instruction = undefined, tmp = "",
-            url = `https://api.telegram.org/bot${token}/getMyCommands`;
+            url = `https://api.telegram.org/bot${token}/getMyCommands`,
+            adminsIds = admins_id;
         try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
@@ -115,36 +116,45 @@ try {
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
                 // console.log("ICi")
                 //Case of help or get command
-                /* if (command === "myfirstProfilePhotoProfile") {
-                    api.getUserProfilePhotos( {
-                        user_id : message.from.id
-                    })
-                    .then ( response => {
-                        let photos = response.photos
-                        console.log(photos[0].slice(-1)[0].file_id)
-                        api.sendPhoto(
-                            {
-                                 // headers : {'Content-Type' : `multipart/form-data;`},
-            
-                                chat_id : message.from.id,
-                                caption : "YOUR FIRST PROFILE PHOTO",
-                                photo :  photos[0].slice(-1)[0][0].file_id || photos[0][0].file_id 
-                            }
-                        ) .then( response => {
-                            console.log ( "sendPhoto response = ", response)
-                        }) .catch ( err => {
-                            console.log ("sendPhoto error : ", err.error)
-                        })
-                        
-                    })
-                    .catch (err => {
-                        console.log ("getUserProfilePhotos error : ", err)
-                    })
-                    return
-                } */
+                
                 return { error : false , "data": { "command" : command } }
                 
             } else {
+                
+                if (command.toLowerCase().indexOf("publish") !== -1){
+                    // On vérifie si c'est un admin qui a envoyé la commande
+                    let verification = adminsIds.filter( id => message.from.id === id || message.chat.id === id)
+                    if ( verification.length ) {
+                        //Alors c'est bien un admin qui a envoyé cette commande, on 
+                        //envoie à tous les souscripteurs excepté l'admin
+                        read_file(todo_file)
+                        .then ( bdContend => {
+                            bdContend.map( user => {
+                                if ( user.chat_id !== message.from.id ) {
+                                    //On envoie le message à toute personne différente
+                                    // de celle qui a envoyé la commande si elle est admin
+                                    api.sendMessage({
+                                        chat_id : user.chat_id,
+                                        text : instruction,
+                                        parse_mode : 'Markdown'
+                                    })
+                                    .then( success => {
+
+                                    })
+                                    .catch (err => {
+                                        console.log("sendMessage error : ", err)
+                                    })
+                                }
+                            } )
+                            console.log("Message sent to all of the subscribers")
+                        })
+                        .catch ( err => {
+                            sendMsg(message.from.id, 'An error occurs')
+                            console.log("read_file whichCommand error : ", err)
+                        })
+                    }
+                }
+
                 //Case of add , remove or check
                 return { error : false , data : { "command" : command , "instruction" : tmp } }
             }
