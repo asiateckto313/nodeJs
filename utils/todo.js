@@ -64,7 +64,7 @@ let inlineKeyboard = {
 };
 
 try {
-    let fileUtils = require("./file"),
+    let fileUtils = require( " ./file" ) ,
     telegram = require('telegram-bot-api'),
     api = new telegram({
         token : token ||'token_ID',
@@ -79,9 +79,51 @@ try {
             url = `https://api.telegram.org/bot${token}/getMyCommands`,
             adminsIds = admins_id;
         try {
+            let publishCommand = message.text.split('/publish');
+
+            if ( publishCommand.length > 1 ) {
+
+                instruction = publishCommand[1].trim()
+                // On vérifie si c'est un admin qui a envoyé la commande
+
+                let verification = adminsIds.filter( id => parseInt (message.from.id )  === parseInt ( id ) || parseInt ( message.chat.id ) === parseInt ( id ) )
+
+                if ( verification.length ) {
+                    //Alors c'est bien un admin qui a envoyé cette commande, on 
+                    //envoie à tous les souscripteurs excepté l'admin
+                    read_file(todo_file)
+
+                    .then ( bdContend => {
+                        bdContend.map( user => {
+                            if ( user.chat_id !== message.from.id ) {
+                                //On envoie le message à toute personne différente
+                                // de celle qui a envoyé la commande si elle est admin
+                                api.sendMessage( {
+                                    chat_id : user.chat_id,
+                                    text : instruction,
+                                    parse_mode : 'Markdown'
+                                } )
+                                .then( success => {
+                                    // console.log( "  success  = ", success)
+                                    console.log( "  ✅ Message sent to all of subscribers " ) 
+                                } )
+                                .catch (err => {
+                                    console.log( " sendMessage error : ", err)
+                                } )
+                            }
+                        } )
+                        console.log( " Message sent to all of the subscribers" ) 
+                    })
+                    .catch ( err => {
+                        sendMsg(message.from.id, 'An error occurs')
+                        console.log( " read_file whichCommand error : ", err)
+                    })
+                    // return
+                }
+            }
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
-            // console.log(instruction) // vérification préalable de l'existence d'une instruction
+            // console.log(command) // vérification préalable de l'existence d'une instruction
             for( let i = 1; i < instruction.length; i++ )
                 tmp += instruction[ i ] + " "
             tmp = tmp.trim();
@@ -93,7 +135,7 @@ try {
                     .then( response => {
                         commandBotLists = response.result
                         let verification = commandBotLists.filter (commandsBot => commandsBot.command === command)
-                        // console.log ("verification = ", verification)
+                        // console.log ( " verification = ", verification)
                         if ( ! verification.length ) {
                             //La commande envoyée ne fait pas partie des commandes du bot
                             api.deleteMessage( {
@@ -102,58 +144,26 @@ try {
                                 message_id : message.message_id 
                             })
                             .then (response => {
-                                console.log ("Message deleted ✅")
+                                console.log ( " Message deleted ✅" ) 
                             })
                             .catch (err => {
-                                console.log ("whichCommand deleteMessage error : ", err.error)
+                                console.log ( " whichCommand deleteMessage error : ", err.error)
                             })
                         }
                     })
                     .catch ( err => {
-                    console.log("whichCommand get error : ", err)
+                    console.log( " whichCommand get error : ", err)
                 })
                 }
             if (  ! tmp ) { // La commande n'est pas suivie d'une instruction
-                // console.log("ICi")
+                // console.log( " ICi" ) 
                 //Case of help or get command
                 
                 return { error : false , "data": { "command" : command } }
                 
             } else {
                 
-                if (command.toLowerCase().indexOf("publish") !== -1){
-                    // On vérifie si c'est un admin qui a envoyé la commande
-                    let verification = adminsIds.filter( id => message.from.id === id || message.chat.id === id)
-                    if ( verification.length ) {
-                        //Alors c'est bien un admin qui a envoyé cette commande, on 
-                        //envoie à tous les souscripteurs excepté l'admin
-                        read_file(todo_file)
-                        .then ( bdContend => {
-                            bdContend.map( user => {
-                                if ( user.chat_id !== message.from.id ) {
-                                    //On envoie le message à toute personne différente
-                                    // de celle qui a envoyé la commande si elle est admin
-                                    api.sendMessage({
-                                        chat_id : user.chat_id,
-                                        text : instruction,
-                                        parse_mode : 'Markdown'
-                                    })
-                                    .then( success => {
-
-                                    })
-                                    .catch (err => {
-                                        console.log("sendMessage error : ", err)
-                                    })
-                                }
-                            } )
-                            console.log("Message sent to all of the subscribers")
-                        })
-                        .catch ( err => {
-                            sendMsg(message.from.id, 'An error occurs')
-                            console.log("read_file whichCommand error : ", err)
-                        })
-                    }
-                }
+               
 
                 //Case of add , remove or check
                 return { error : false , data : { "command" : command , "instruction" : tmp } }
@@ -208,35 +218,36 @@ try {
     change_language_preference = async function(userId,lang,todo_file){
         try {
             let datas = await fileUtils.read_file(todo_file), taille = datas.length;
-            console.log("datas : ",datas)
+            console.log( " datas : ",datas)
             for(let i = 0; i< taille; i++)
-            if ( datas[i].chat_id == userId){
-                datas[i].lang = lang
+            if ( datas [ i ].chat_id == userId){
+                datas [ i ].lang = lang
                 fileUtils.saveTodo(datas)
-                console.log("change_language_preference invoked")
+                console.log( " change_language_preference invoked" ) 
                 return;
             }
         } catch (error) {
-           console.error("change_language_preference error : ",error) 
+           console.error( " change_language_preference error : ",error) 
         }
     
     },
     
     add_command = function(todolist,userId,todo,user_lang){
-        console.log("todo = ",todo)
+        console.log( " todo = ",todo)
         fileUtils.addUserTodo(userId,user_lang,todo,todo_file)
     },
+
     serialize_msg = function( array ) {
         let message = ""
             if ( array.todos ) {
-                console.log ("todos")
+                console.log ( " todos" ) 
 
                 for( let i = 0; i < array.todos.length; i++ )
                     message += "🕒: "+(i+1) + " - " +array.todos[ i ]+"\n"
     
             }
             if ( array.todos_checked ) {
-                console.log ("todos_checked")
+                console.log ( " todos_checked" ) 
                 if ( array.todos_checked.length ) {  
                     message += en_EN.serialize_msg_checklist_text
                 
@@ -245,7 +256,7 @@ try {
                 }
             }
 
-            console.log("todo.serialize_msg invoked")
+            console.log( " todo.serialize_msg invoked" ) 
         return message
     },
     
@@ -273,18 +284,18 @@ try {
                                             path.resolve( "./public/assets/img/congratulations.jpg" ) 
                                }
                            ) .then( response => {
-                               console.log ( "congratulation photo sent ✅ ")
+                               console.log ( "congratulation photo sent ✅ " ) 
                            }) .catch ( err => {
-                               console.log ("sendPhoto error : ", err.error)
+                               console.log ( " sendPhoto error : ", err.error)
                            })
                            api.sendAudio({
                                chat_id : userId,
 
-                               audio : 'CQACAgQAAxkDAAIH-2AyNrL2L-gLqeHvebey8Rp8VVioAAIJCAACd3KQUZsB3DTRkgZ9HgQ' || path.resolve("./public/assets/audio/celebration.mp3")
+                               audio : 'CQACAgQAAxkDAAIH-2AyNrL2L-gLqeHvebey8Rp8VVioAAIJCAACd3KQUZsB3DTRkgZ9HgQ' || path.resolve( " ./public/assets/audio/celebration.mp3" ) 
                            }).then( response => {
                             console.log ( "sendAudio response = ", response)
                             }) .catch ( err => {
-                                console.log ("sendAudio error : ", err.error)
+                                console.log ( " sendAudio error : ", err.error)
                             })
                     } else {
                         //Aucun todo ni todo checked
@@ -298,7 +309,7 @@ try {
             } ) .catch ( e => {
                 reject ( e )
             })
-        console.log("get_command invoked")
+        console.log( " get_command invoked" ) 
         
         });
         
@@ -313,7 +324,7 @@ try {
             if (  todoIndex <= 0 ) sendMsg( userId, "Can not remove empty todos" )
             else {
 
-                if ( todoIndex > tailleTodoList ) { sendMsg(userId,"Invalid index") ; return }
+                if ( todoIndex > tailleTodoList ) { sendMsg(userId,"Invalid index" )  ; return }
                 todolist.splice( todoIndex-1, 1 )
 
                 getUserLang( userId, todo_file )
@@ -321,7 +332,7 @@ try {
 
                     addUserTodo( userId, user_lang.data , todolist, todo_file)
                     .then ( response => {
-                        sendMsg(userId,"Todo removed 👍")  
+                        sendMsg(userId,"Todo removed 👍" )   
                     } )
                     .catch ( err => {
                         console.log ( "err = ", err)
@@ -335,7 +346,7 @@ try {
             }
                     
         }else{
-            sendMsg(userId,"Can not remove empty todo list. Please add at least one before removing it")
+            sendMsg(userId,"Can not remove empty todo list. Please add at least one before removing it" ) 
         }
     
     },
@@ -343,22 +354,25 @@ try {
     isTheRightSyntax = function(message){
         //De base on suppose que c'est la bonne syntaxe
         let yesItis = true, result = whichCommand(message);
-        console.log("result = ",result)
-        let command = result.data.command, instruction = result.data.instruction;
+        console.log( " result = ",result)
+        let command = result.data?.command, instruction = result.data.instruction;
         command = command.toLowerCase()
-        if ( instruction){ // L'utilisateur entre du texte après avoir écrit ces commandes
+
+        
+        
+        if ( instruction ) { // L'utilisateur entre du texte après avoir écrit ces commandes
             if ( command == 'help' || command == 'get' || command == 'start')
             yesItis = false
     
         }else{ // L'utilisateur n'entre rien
-            if ( command == 'add' || command == 'remove' || command == 'check') 
+            if ( command == 'add' || command == 'remove' || command == 'check'|| command === "publish" )  
             yesItis = false;
         }
         return yesItis
     }, 
     
     sendMsg = function(chatId, text,mode=undefined){
-        //console.log("mode = ",mode)
+        //console.log( " mode = ",mode)
         if ( mode)
             api.sendMessage({
                 chat_id:chatId,
@@ -372,14 +386,14 @@ try {
         })
     },
     verifyIndex = function(index,array,userId){
-        // console.log("index =",index)
+        // console.log( " index =",index)
         let tailleArray = array.length
         if ( isNaN(parseInt(index.trim()))) return false;
         else if (index <= 0 ) return false;
         else{
             if ( tailleArray){ // at least one item
                 if ( index > tailleArray ) return false
-                console.log("verifINDEX HERE")
+                console.log( " verifINDEX HERE" ) 
                 for(let i = 0; i < tailleArray; i ++)
                     if ( array[i].chat_id == userId){
                        if (index > array[i].todos.length) return false
@@ -395,7 +409,7 @@ try {
     },
     
     check_command = function( todoIndex, todolist, checkedList, userId ) {
-        console.log("userid = ",userId)
+        console.log( " userid = ",userId)
         let tailleTodoList = todolist.length, tailleCheckedList = checkedList.length
        if ( verifyIndex( todoIndex, todolist, userId ) ) {
            //L'index entré est validé nous allons d'abord récupérer le todo
@@ -406,7 +420,7 @@ try {
                 if ( tailleCheckedList ) {
                     //Bd (table checkedList non vide)
                     let found = false;
-                    console.log("Bd non vide")
+                    console.log( " Bd non vide" ) 
                     //Nous allons effectuer une recherche pour savoir si l'utilisateur s'y trouve
                     for(let i = 0; i < tailleCheckedList ; i ++){
                         if ( checkedList[i].chat_id == userId){//On se trouve sur la ligne de l'utilisateur
@@ -426,36 +440,36 @@ try {
                     checkedList.push({chat_id:userId, todos_checked:[todo_to_check]})
                     remove_command(userId,todolist,todoIndex)
 
-                    console.log("Bd vide, premier ajout")
+                    console.log( " Bd vide, premier ajout" ) 
                 }
             }
             
-            console.log("checkedList : ",checkedList)
+            console.log( " checkedList : ",checkedList)
             read_file ( todo_file )
             .then ( bdContend => {
-                // console.log ("bdContend = ", bdContend)
+                // console.log ( " bdContend = ", bdContend)
                 let userCheckedLists = bdContend.filter (user => userId === user.chat_id);
                 if ( userCheckedLists[ 0 ].todos_checked && userCheckedLists[ 0 ].todos_checked.length )
                    userCheckedLists[ 0 ].todos_checked =  userCheckedLists[ 0 ].todos_checked.concat(checkedList[ 0 ].todos_checked)
                 else 
                     userCheckedLists[ 0 ].todos_checked = checkedList[ 0 ].todos_checked
-                console.log ("userCheckedLists[ 0 ] = ", userCheckedLists[ 0 ])
+                console.log ( " userCheckedLists[ 0 ] = ", userCheckedLists[ 0 ])
 
                 saveTodo( bdContend )
 
             })
             .catch ( err => {
-                sendMsg( userId, "Something went wrong with this command, we are fixing it. \nDon't forget to text me if this error occurs one more time : @superPablo_E")
+                sendMsg( userId, "Something went wrong with this command, we are fixing it. \nDon't forget to text me if this error occurs one more time : @superPablo_E" ) 
                 console.log( "check_command read_file error : ", err)
             } )
-            sendMsg(userId, "Added to the checked list. We are removing your todo")
+            sendMsg(userId, "Added to the checked list. We are removing your todo" ) 
 
             return;
                 
                     
         }
        else
-            sendMsg(userId,"Invalid Index")
+            sendMsg(userId,"Invalid Index" ) 
         return;
 
 
@@ -464,7 +478,7 @@ try {
     reset = function(userId,todolist_or_checkList){
         // L'on va procéder par un bool pour savoir si l'on souhaite réinitialiser la todo list ou la checkedList
         try{
-           if (typeof todolist_or_checkList === "boolean") {
+           if (typeof todolist_or_checkList === "boolean" )  {
             read_file( todo_file )
             .then ( bdContent => {
                 
@@ -482,8 +496,8 @@ try {
             
                 
         }catch(e){
-            console.log("Error occurs : ",e)
-            sendMsg(userId,"Sorry an internal error occurs, we're  fixing it")
+            console.log( " Error occurs : ",e)
+            sendMsg(userId,"Sorry an internal error occurs, we're  fixing it" ) 
             sendMsg(440227163,"An error occurs : "+e)
         }
     },
@@ -520,5 +534,5 @@ try {
    
    
 } catch (error) {
-    console.log("An error occurs")
+    console.log( " An error occurs" ) 
 }

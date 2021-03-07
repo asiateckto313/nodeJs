@@ -207,7 +207,8 @@ try{
         
         if (  username == undefined || username == "-" ) username = message.from.first_name
 
-        fileUtils.getUserLang( userId,fileUtils.todo_file ).then(async (result) => {
+        fileUtils.getUserLang( userId,fileUtils.todo_file )
+        .then(async (result) => {
             //Récupération du langage défini par l'utilisateur
             // console.log (  "getUserLang result = ", result )
             if ( ! result.error ) {
@@ -420,7 +421,7 @@ try{
 
         }).catch( ( e ) => {
             //Le fichier est vide
-            console.log ( "Fichier vide, première insertion : ", e )
+            console.log ( "getUserLang error : ", e )
         })
 
     });

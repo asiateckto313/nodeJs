@@ -128,11 +128,11 @@ addUserTodo = async function (userId,user_lang,todo,todo_file){
     let todolist = await read_file(todo_file),taille_bd = todolist.length;
     let temp = multi_add(userId,todo,user_lang).todos
     console.log("temp = ",temp)
-    if(taille_bd){
-      for(let user of todolist){
-        if(user.chat_id == userId){
-          if (Array.isArray(todo)) {console.log("array");user.todos = todo; saveTodo(todolist); return}
-          user.todos = user.todos.concat(temp)
+    if( taille_bd ) {
+      for( let user of todolist ) {
+        if( user.chat_id == userId ) {
+          if  ( Array.isArray( todo ) ) { console.log("array");user.todos = todo; saveTodo(todolist); return }
+          user.todos = user.todos.concat( temp )
           //user.todos.push(todo)
           saveTodo(todolist)
           console.log("addUserTodo invoked, user found in db")
