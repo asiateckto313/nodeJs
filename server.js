@@ -63,7 +63,7 @@ try{
             console.log ( user_lang.data)
             if ( user_lang.data.toLowerCase() === "english") {
                 //SI sa préférence linguistique est l'anglais, alors on lui répond en anglais
-                if ( result.data.command == 'get' ) {
+                /* if ( result.data.command == 'get' ) {
                     todoUtils.get_command(todolist,checkList,userId).then(msg => {
                         console.log ( "msg = ",msg)
                         if ( msg !== "")
@@ -75,7 +75,7 @@ try{
                         console.log ("inline get_command error : ", err)
                     })
                     
-                }
+                } */
 
                 if ( result.data.command == 'help')
                 todoUtils.help_command(userId)
@@ -116,12 +116,37 @@ try{
                         todoUtils.sendMsg(userId,"Send now the index of the todo to check")
         
                 }
+                if ( result.data.command == 'set_bot_lang' ) {
+                    set_lang_inline = true
+                    if ( ! result.data.instruction )
+                        todoUtils.sendMessage_with_inlineKey( userId, "*Choose the language you want to apply*" , langs_option )
+                    else { 
+                        if ( result.data.instruction.trim().toLowerCase()=='english' ) { 
+                            eng = true; 
+                            french = false;
+                            set_lang_inline = false
+                            todoUtils.sendMsg( userId ," ✅ Language set to English")
+                        }
+
+                        if ( result.data.instruction.trim().toLowerCase() == 'french' ) { 
+                            eng = false; 
+                            french = true; 
+                            set_lang_inline = false
+                            todoUtils.sendMsg( userId ," ✅ Langue choisie : Français")
+                        }
+                        todoUtils.change_language_preference( userId, eng ? 'english' : 'french', todo_file )
+                    }
+               
+                    
+                }
     
             } else if (user_lang.data.toLowerCase() === "french" ) {
+
                 if ( result.data.command == 'get' ) {
-                    todoUtils_fr.get_command(todolist,checkList,userId).then(msg => {
-                        console.log ( "msg = ",msg)
-                        if ( msg !== "")
+                    todoUtils_fr.get_command(todolist,checkList,userId)
+                    .then(msg => {
+                        console.log ( " french msg = ",msg)
+                        if ( msg !== "" && msg !== ' ')
                             todoUtils.sendMsg(userId,msg)
                         else
                             todoUtils.sendMsg(userId,fr_FR.check_empty_text)
@@ -156,6 +181,7 @@ try{
                     todoUtils.sendMsg(userId,fr_FR.remove_index_text)
                 }
                 if (  result.data.command == 'check' ) {
+                    //TODO terminer cette commande en sauvegardant le todo check dans le fichier
                     check_inline= true
                     todoUtils.sendMsg(userId,fr_FR.check_index_text)
                 }
@@ -163,7 +189,7 @@ try{
                 if ( result.data.command == 'set_bot_lang' ) {
                     set_lang_inline = true
                     if ( ! result.data.instruction )
-                        todoUtils_fr.sendMessage_with_inlineKey( userId, "*Sélectionner la langue*" , langs_option )
+                        todoUtils.sendMessage_with_inlineKey( userId, "*Sélectionner la langue*" , langs_option )
                     else { 
                         if ( result.data.instruction.trim().toLowerCase()=='english' ) { 
                             eng = true; 
@@ -178,6 +204,7 @@ try{
                             set_lang_inline = false
                             todoUtils.sendMsg( userId ," ✅ Langue choisie : Français")
                         }
+                        todoUtils.change_language_preference( userId, eng ? 'english' : 'french', todo_file )
                     }
                
                     
@@ -272,7 +299,6 @@ try{
 
                                     } else  {  // Sans instruction il s'agit des syntaxes get, commands et help
                                         if ( command == 'reset' ) {
-                                            //TODO reset
                                             todoUtils.sendMsg(userId,"Nous sommes en train d'implémenter cette syntaxe")
                                             todoUtils_fr.sendMessage_with_inlineKey(userId, "*Quelle liste souhaitez-vous réinitialiser ?*",reset_option)
                                         }
@@ -358,7 +384,6 @@ try{
                                         }
 
                                         if ( command == 'reset' ) {
-                                            //TODO reset
                                             // todoUtils.sendMsg( userId, "We are working on this feature" )
                                             todoUtils.sendMessage_with_inlineKey( userId, "*What list do you want to reset ?*", todoUtils.reset_option )
                                         }

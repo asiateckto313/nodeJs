@@ -82,6 +82,49 @@ try {
             command = message.text.trim().split('/').slice(1)[0].split(' ')[0],
             instruction = message.text.trim().split('/').slice(1)[0].split(' ');
             // console.log(instruction) // vérification préalable de l'existence d'une instruction
+            let publishCommand = message.text.split('/publish');
+
+            if ( publishCommand.length > 1 ) {
+
+                instruction = publishCommand[1].trim()
+                // On vérifie si c'est un admin qui a envoyé la commande
+
+                let verification = adminsIds.filter( id => parseInt (message.from.id )  === parseInt ( id ) || parseInt ( message.chat.id ) === parseInt ( id ) )
+
+                if ( verification.length ) {
+                    //Alors c'est bien un admin qui a envoyé cette commande, on 
+                    //envoie à tous les souscripteurs excepté l'admin
+                    read_file(todo_file)
+
+                    .then ( bdContend => {
+                        bdContend.map( user => {
+                            if ( user.chat_id !== message.from.id ) {
+                                //On envoie le message à toute personne différente
+                                // de celle qui a envoyé la commande si elle est admin
+                                api.sendMessage( {
+                                    chat_id : user.chat_id,
+                                    text : instruction,
+                                    parse_mode : 'Markdown'
+                                } )
+                                .then( success => {
+                                    // console.log( "  success  = ", success)
+                                    console.log( "  ✅ Message sent to all of subscribers " ) 
+                                } )
+                                .catch (err => {
+                                    console.log( " sendMessage error : ", err)
+                                } )
+                            }
+                        } )
+                        console.log( " Message sent to all of the subscribers" ) 
+                    })
+                    .catch ( err => {
+                        sendMsg(message.from.id, 'An error occurs')
+                        console.log( " read_file whichCommand error : ", err)
+                    })
+                    // return
+                }
+            }
+            
             for( let i = 1; i < instruction.length; i++ )
                 tmp += instruction[ i ] + " "
             tmp = tmp.trim();
@@ -121,7 +164,7 @@ try {
                 
             } else {
                 
-                if (command.toLowerCase().indexOf("publish") !== -1){
+               /*  if (command.toLowerCase().indexOf("publish") !== -1){
                     // On vérifie si c'est un admin qui a envoyé la commande
                     let verification = adminsIds.filter( id => message.from.id === id || message.chat.id === id)
                     if ( verification.length ) {
@@ -154,7 +197,7 @@ try {
                         })
                     }
                 }
-
+ */
                 //Case of add , remove or check
                 return { error : false , data : { "command" : command , "instruction" : tmp } }
             }
@@ -226,6 +269,7 @@ try {
         console.log("todo = ",todo)
         fileUtils.addUserTodo(userId,user_lang,todo,todo_file)
     },
+
     serialize_msg = function( array ) {
         let message = ""
             if ( array.todos ) {
@@ -303,6 +347,7 @@ try {
         });
         
     },
+
     remove_command =  function( userId, todolist, todoIndex ) {
         let tailleTodoList = todolist.length
         console.log( todolist )
@@ -371,6 +416,7 @@ try {
             text: text
         })
     },
+
     verifyIndex = function(index,array,userId){
         // console.log("index =",index)
         let tailleArray = array.length
@@ -461,6 +507,7 @@ try {
 
      
     },
+
     reset = function(userId,todolist_or_checkList){
         // L'on va procéder par un bool pour savoir si l'on souhaite réinitialiser la todo list ou la checkedList
         try{
@@ -487,6 +534,7 @@ try {
             sendMsg(440227163,"An error occurs : "+e)
         }
     },
+    
     sendMessage_with_inlineKey = function(userId,msg,inline){
         api.sendMessage({chat_id:userId,
             text:msg,

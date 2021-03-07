@@ -1,3 +1,5 @@
+const { read_file, todo_file } = require("./file");
+const { serialize_msg, sendMsg } = require("./todo");
 
 try {
     let fileUtils = require("./file"),
@@ -25,9 +27,62 @@ try {
     add_command = function(todolist,userId,todo,user_lang){
         todoUtils.add_command(todolist,userId,todo,user_lang);
     }, 
+    get_command =  function( todolist , checkedList , userId){
+        let msg = "";
+        return new Promise((resolve, reject) => {
+            read_file ( todo_file )
+            .then ( bdContent => {
+                let user = bdContent.filter ( users => users.chat_id === userId)
+                if ( user[ 0 ].todos && user[ 0 ].todos.length ) {
+                    // L'utilisateur a au moins un todo
+                    msg += fr_FR.serialize_msg_todolist_text + serialize_msg ( user[ 0 ] )
+                } else {
+                    //L'utilisateur n'a peut être pas de todos mais check tous ses todo
+                    if ( ! user[ 0 ].todos.length && user[ 0 ].todos_checked 
+                        && user [ 0 ].todos_checked.length ) {
+                           // L'utilisateur a check tous ses todos, on réinitialise sa checkedList
+                           reset(userId, false) // false because 
+                           //et on l'encourage à terminer toutes ses tâches en lui envoyant une photo
+                           api.sendPhoto(
+                               {
+                                   chat_id : userId,
+                                   caption : "🥳 CONGRATULATIONS YOU'VE CHECKED ALL YOUR TODOS 🤩",
+                                   photo :  'AgACAgQAAxkDAAIH-mAyNqyaKnJ0OfuOdx5zb2QkeOiiAAKCtTEbd3KQUV5qMd9Wza03qGcaJ10AAwEAAwIAA3kAA5luBQABHgQ' || 
+                                            path.resolve( "./public/assets/img/congratulations.jpg" ) 
+                               }
+                           ) .then( response => {
+                               console.log ( "congratulation photo sent ✅ ")
+                           }) .catch ( err => {
+                               console.log ("sendPhoto error : ", err.error)
+                           })
+                           api.sendAudio({
+                               chat_id : userId,
+
+                               audio : 'CQACAgQAAxkDAAIH-2AyNrL2L-gLqeHvebey8Rp8VVioAAIJCAACd3KQUZsB3DTRkgZ9HgQ' || path.resolve("./public/assets/audio/celebration.mp3")
+                           }).then( response => {
+                            console.log ( "sendAudio response = ", response)
+                            }) .catch ( err => {
+                                console.log ("sendAudio error : ", err.error)
+                            })
+                    } else {
+                        //Aucun todo ni todo checked
+                        msg = fr_FR.check_empty_text
+                    }
+                }
+
+                (msg !== '') ? sendMsg( userId , msg ) : ''
+
+
+            } ) .catch ( e => {
+                reject ( e )
+            })
+        console.log("get_command invoked")
+        
+        });
+        
+    },
     
-    
-    get_command = function(todolist,checkedList,userId){
+    /* get_command = function(todolist,checkedList,userId){
         let message = "";
         return new Promise((resolve, reject) => {
             fileUtils.getUserTodos(userId,fileUtils.todo_file).then(res =>{
@@ -46,6 +101,8 @@ try {
                                     message += fr_FR.serialize_msg_checklist_text + todoUtils.serialize_msg(checkedList[j])
                        
                     }
+                    console.log("french message =", message)
+
                     resolve(message)
                 }
             }).catch(e=>{
@@ -54,7 +111,8 @@ try {
         console.log("todo_fr.get_command invoked")
         
         })
-        },
+    }, */
+
     remove_command = async  function( userId, todolist, todoIndex){
        try {  
             todoIndex = parseInt(todoIndex)
